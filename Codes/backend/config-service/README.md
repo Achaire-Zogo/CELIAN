@@ -64,6 +64,7 @@ celian-config/
 ```
 
 ## Encryption/Decryption
+
 ```java
 @Configuration
 @EnableConfigServer
@@ -79,6 +80,7 @@ public class EncryptionConfig {
 ```
 
 ## Client Configuration
+
 Pour les services clients, ajouter dans leur `bootstrap.yml` :
 ```yaml
 spring:
@@ -106,6 +108,7 @@ POST /actuator/refresh
 ```
 
 ## Sécurité
+
 ```java
 @Configuration
 @EnableWebSecurity
@@ -124,6 +127,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 ```
 
 ## Monitoring
+
 Integration avec Spring Boot Actuator :
 ```yaml
 management:

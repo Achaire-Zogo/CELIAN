@@ -58,6 +58,7 @@ public class DiscoveryServiceApplication {
 ```
 
 ## Configuration Eureka
+
 ```java
 @Configuration
 public class EurekaConfig {
@@ -88,6 +89,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 ```
 
 ## Client Configuration
+
 Pour les services clients, ajouter dans leur `application.yml` :
 ```yaml
 eureka:
@@ -101,6 +103,7 @@ eureka:
 ```
 
 ## Dashboard
+
 - URL: http://localhost:8761
 - Fonctionnalités:
   - Liste des instances
@@ -109,7 +112,9 @@ eureka:
   - Configuration
 
 ## Haute Disponibilité
+
 Configuration pour cluster Eureka :
+
 ```yaml
 eureka:
   client:
@@ -118,12 +123,14 @@ eureka:
 ```
 
 ## Métriques et Monitoring
+
 - Intégration avec Spring Boot Actuator
 - Endpoints de santé
 - Métriques JVM
 - Métriques personnalisées
 
 ## Docker
+
 ```dockerfile
 FROM openjdk:17-jdk-slim
 VOLUME /tmp
@@ -137,6 +144,7 @@ docker run -p 8761:8761 celian/discovery-service
 ```
 
 ## Docker Compose
+
 ```yaml
 version: '3.8'
 services:
@@ -151,11 +159,13 @@ services:
 ```
 
 ## Tests
+
 ```bash
 ./mvnw test
 ```
 
 ## Logging
+
 ```yaml
 logging:
   level:
@@ -164,12 +174,14 @@ logging:
 ```
 
 ## Intégration
+
 - Spring Cloud Config
 - Spring Boot Admin
 - Prometheus
 - Grafana
 
 ## Production Checklist
+
 - [ ] Sécurité configurée
 - [ ] SSL/TLS activé
 - [ ] Monitoring en place
