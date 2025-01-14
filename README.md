@@ -50,7 +50,7 @@ CELIAN est une plateforme de vente en ligne de véhicules moderne et robuste, co
 1. Cloner le repository
 
 ```bash
-git clone https://github.com/Acahire-ZOGO/CELIAN.git
+git clone https://github.com/Acahire-Zogo/CELIAN.git
 cd CELIAN
 ```
 
