@@ -24,7 +24,6 @@ graph TD
     end
 ```
 
-
 ## 2. Module Catalogue
 
 ![Catalogue Module](user-stories/catalogue.png)
