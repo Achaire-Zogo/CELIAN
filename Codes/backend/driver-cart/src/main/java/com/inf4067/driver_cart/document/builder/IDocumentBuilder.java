@@ -1,6 +1,6 @@
 package com.inf4067.driver_cart.document.builder;
 
-import com.inf4067.driver_cart.document.model.Document;
+import com.inf4067.driver_cart.document.adapter.IDocumentFormat;
 
 public interface IDocumentBuilder {
 
@@ -12,7 +12,7 @@ public interface IDocumentBuilder {
 
     public void setContent(String text);
 
-    public Document getDocument();
+    public IDocumentFormat getDocument();
 
     //void addImage(String imagePath);
 }

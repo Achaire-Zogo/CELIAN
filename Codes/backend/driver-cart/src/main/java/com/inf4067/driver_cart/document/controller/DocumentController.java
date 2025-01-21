@@ -6,10 +6,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.inf4067.driver_cart.document.model.Document;
-import com.inf4067.driver_cart.document.model.HtmlDocument;
-import com.inf4067.driver_cart.document.model.PdfDocument;
+import com.inf4067.driver_cart.document.model.VehicleDocument;
+import com.inf4067.driver_cart.document.request.BundleRequest;
 import com.inf4067.driver_cart.document.service.DocumentService;
+import com.inf4067.driver_cart.document.singleton.DocumentBundle;
 
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -27,35 +27,50 @@ public class DocumentController {
     private DocumentService documentService;
 
     @PostMapping("/pdf/generate")
-    public Document createPdfDocument(@RequestBody PdfDocument document) {
-        return documentService.createPdfDocument(document);
+    public DocumentBundle createPdfDocument(@RequestBody BundleRequest request) {
+        return documentService.createPdfDocument(request);
     }
 
     @PostMapping("/html/generate")
-    public Document createHtmlDocument(@RequestBody HtmlDocument document) {
-        return documentService.createHtmlDocument(document);
+    public DocumentBundle createHtmlDocument(@RequestBody BundleRequest request) {
+        return documentService.createHtmlDocument(request);
     }
     
     @GetMapping
-    public List<Document> getDocuments() {
+    public List<VehicleDocument> getDocuments() {
         return documentService.getAllDocuments();
     }
     
     @GetMapping("/{id}")
-    public Document getDocument(@PathVariable long id) {
+    public VehicleDocument getDocument(@PathVariable long id) {
         return documentService.getDocumentById(id);
     }
 
     @GetMapping("/pdf")
-    public List<Document> getPdfDocuments() {
+    public List<VehicleDocument> getPdfDocuments() {
         return documentService.getPdfDocuments();
     }
     
     @GetMapping("/html")
-    public List<Document> getHtmlDocuments() {
+    public List<VehicleDocument> getHtmlDocuments() {
         return documentService.getHtmlDocuments();
     }
     
+    @GetMapping("/registration-requests")
+    public List<VehicleDocument> getRegistrationRequestsDocuments() {
+        return documentService.getRegistrationRequestsDocuments();
+    }
+
+    @GetMapping("/transfert-certificates")
+    public List<VehicleDocument> getTransfertCertificateDocuments() {
+        return documentService.getTransfertCertificatesDocuments();
+    }
+
+    @GetMapping("/purchase-orders")
+    public List<VehicleDocument> getPurchaseOrdersDocuments() {
+        return documentService.getPurchaseOrdersDocuments();
+    }
+
     @DeleteMapping("/{id}")
     public String deleteDocument(@PathVariable long id) {
         documentService.deleteDocument(id);
