@@ -1,0 +1,14 @@
+{
+    "configurations": [
+        {
+            "type": "java",
+            "name": "Spring Boot-DriverCartApplication<driver-cart>",
+            "request": "launch",
+            "cwd": "${workspaceFolder}",
+            "mainClass": "com.inf4067.driver_cart.DriverCartApplication",
+            "projectName": "driver-cart",
+            "args": "",
+            "envFile": "${workspaceFolder}/.env"
+        }
+    ]
+}
