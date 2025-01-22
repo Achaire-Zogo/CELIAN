@@ -1,8 +1,9 @@
 package com.inf4067.driver_cart.document.model;
 
+import com.inf4067.driver_cart.document.builder.IDocumentBuilder;
+import com.inf4067.driver_cart.document.enumeration.DocumentFormat;
 import com.inf4067.driver_cart.document.enumeration.DocumentType;
 
-import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -13,6 +14,7 @@ import jakarta.persistence.Inheritance;
 import jakarta.persistence.InheritanceType;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 @Entity
@@ -20,29 +22,40 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Inheritance(strategy = InheritanceType.JOINED)
-public abstract class Document {
-
+@EqualsAndHashCode(callSuper = false)
+public abstract class VehicleDocument {
+    
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
-    @Column(unique = true)
+    /*@Column(unique = true)
     private String name;
     private String header;
     private String title;
-    private String content;
+    private String content;*/
+    private String filepath;
 
     
     @Enumerated(EnumType.STRING)
-    private DocumentType type;
+    private DocumentFormat documentFormat;
 
-    public abstract void generatedDocument();
+    @Enumerated(EnumType.STRING)
+    private DocumentType documentType;
 
-    protected DocumentType getType() {
-        return type;
+    public abstract void generate(IDocumentBuilder documentBuilder);
+
+    protected abstract String getFormattedContent();
+
+    //DocumentType getOutputFormat();
+
+    protected void setDocumentType(DocumentType documentType)
+    {
+        this.documentType = documentType;
     }
 
-    protected void setType(DocumentType type) {
-        this.type = type;
+    protected DocumentType getDocumentType()
+    {
+        return this.documentType;
     }
 }

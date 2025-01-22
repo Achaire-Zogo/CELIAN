@@ -2,13 +2,13 @@ package com.inf4067.driver_cart.document.builder;
 
 import org.springframework.stereotype.Component;
 
-import com.inf4067.driver_cart.document.model.Document;
-import com.inf4067.driver_cart.document.model.HtmlDocument;
+import com.inf4067.driver_cart.document.adapter.HtmlDocument;
+import com.inf4067.driver_cart.document.adapter.IDocumentFormat;
 
 @Component  
 public class HtmlDocumentBuilder implements IDocumentBuilder {
 
-    private Document document;
+    private IDocumentFormat document;
 
     public HtmlDocumentBuilder() {
         this.document = new HtmlDocument();
@@ -34,8 +34,8 @@ public class HtmlDocumentBuilder implements IDocumentBuilder {
     }
 
     @Override
-    public Document getDocument() {
-        this.document.generatedDocument();
+    public IDocumentFormat getDocument() {
+        //this.document.generatedDocument();
         return this.document;
     }
     

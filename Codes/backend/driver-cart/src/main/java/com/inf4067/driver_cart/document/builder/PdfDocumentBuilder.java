@@ -2,16 +2,16 @@ package com.inf4067.driver_cart.document.builder;
 
 import org.springframework.stereotype.Component;
 
-import com.inf4067.driver_cart.document.model.Document;
-import com.inf4067.driver_cart.document.model.PdfDocument;
+import com.inf4067.driver_cart.document.adapter.IDocumentFormat;
+import com.inf4067.driver_cart.document.adapter.PdfDocumentAdapter;
 
 @Component  
 public class PdfDocumentBuilder implements IDocumentBuilder {
 
-    private Document document;
+    private IDocumentFormat document;
 
     public PdfDocumentBuilder() {
-        this.document = new PdfDocument();
+        this.document = new PdfDocumentAdapter();
     }
 
     @Override
@@ -34,8 +34,8 @@ public class PdfDocumentBuilder implements IDocumentBuilder {
     }
 
     @Override
-    public Document getDocument() {
-        this.document.generatedDocument();
+    public IDocumentFormat getDocument() {
+        //this.document.generatedDocument();
         return this.document;
     }
     
