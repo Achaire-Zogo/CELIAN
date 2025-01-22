@@ -1,61 +1,61 @@
 package com.inf4067.driver_cart.order.service;
 
+import com.inf4067.driver_cart.order.dto.AddToCartRequest;
 import com.inf4067.driver_cart.order.model.Cart;
 import com.inf4067.driver_cart.order.model.CartItem;
+import com.inf4067.driver_cart.order.model.CartStatus;
+import com.inf4067.driver_cart.order.repository.CartItemRepository;
 import com.inf4067.driver_cart.order.repository.CartRepository;
 import com.inf4067.driver_cart.user.model.User;
+import com.inf4067.driver_cart.user.service.UserService;
+import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
+import java.util.Optional;
 
 @Service
+@Transactional
 public class CartService {
-    
+
     @Autowired
     private CartRepository cartRepository;
 
-    @Transactional
-    public Cart createCart(User user) {
-        Cart cart = new Cart();
-        cart.setUser(user);
-        return cartRepository.save(cart);
+    public Cart getOrCreateCart(Long userId) {
+        return cartRepository.findByUserId(userId)
+                .orElseGet(() -> {
+                    Cart cart = new Cart();
+                    cart.setUserId(userId);
+                    return cartRepository.save(cart);
+                });
     }
 
-    @Transactional
-    public Cart addItemToCart(Long cartId, CartItem item, User user) {
-        Cart cart = cartRepository.findByIdAndUser(cartId, user)
-                .orElseThrow(() -> new AccessDeniedException("Cart not found or access denied"));
-        
-        cart.addItem(item);
-        return cartRepository.save(cart);
-    }
+    public void addItemToCart(Long userId, Long vehicleId, int quantity) {
+        Cart cart = getOrCreateCart(userId);
+        Optional<CartItem> existingItem = cart.getItems().stream()
+                .filter(item -> item.getVehicleId().equals(vehicleId))
+                .findFirst();
 
-    @Transactional
-    public Cart removeItemFromCart(Long cartId, CartItem item, User user) {
-        Cart cart = cartRepository.findByIdAndUser(cartId, user)
-                .orElseThrow(() -> new AccessDeniedException("Cart not found or access denied"));
-        
-        cart.removeItem(item);
-        return cartRepository.save(cart);
-    }
-
-    public Cart getCart(Long cartId, User user) {
-        return cartRepository.findByIdAndUser(cartId, user)
-                .orElseThrow(() -> new AccessDeniedException("Cart not found or access denied"));
-    }
-
-    public List<Cart> getUserCarts(User user) {
-        return cartRepository.findByUser(user);
-    }
-
-    @Transactional
-    public void clearCart(Long cartId, User user) {
-        if (!cartRepository.existsByIdAndUser(cartId, user)) {
-            throw new AccessDeniedException("Cart not found or access denied");
+        if (existingItem.isPresent()) {
+            existingItem.get().setQuantity(existingItem.get().getQuantity() + quantity);
+        } else {
+            CartItem newItem = new CartItem();
+            newItem.setCart(cart);
+            newItem.setVehicleId(vehicleId);
+            newItem.setQuantity(quantity);
+            cart.getItems().add(newItem);
         }
-        cartRepository.deleteById(cartId);
+
+        cartRepository.save(cart);
+    }
+
+    public void removeItemFromCart(Long userId, Long vehicleId) {
+        Cart cart = getOrCreateCart(userId);
+        cart.getItems().removeIf(item -> item.getVehicleId().equals(vehicleId));
+        cartRepository.save(cart);
+    }
+
+    public Cart getCart(Long userId) {
+        return getOrCreateCart(userId);
     }
 }

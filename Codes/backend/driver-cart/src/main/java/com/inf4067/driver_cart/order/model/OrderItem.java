@@ -4,16 +4,20 @@ import jakarta.persistence.*;
 import lombok.Data;
 
 @Entity
+@Table(name = "order_items")
 @Data
 public class OrderItem {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String productName;
-    private int quantity;
-    private double price;
-    
     @ManyToOne
+    @JoinColumn(name = "order_id")
     private Order order;
+
+    private Long vehicleId; // ID du véhicule
+
+    private int quantity; // Quantité du véhicule
+
+    // Getters and setters
 }

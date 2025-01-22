@@ -1,68 +1,76 @@
 package com.inf4067.driver_cart.order.model;
 
 import com.inf4067.driver_cart.order.state.OrderState;
-import com.inf4067.driver_cart.user.model.User;
 import jakarta.persistence.*;
-import lombok.Data;
-import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.UpdateTimestamp;
-
-import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 
 @Entity
 @Table(name = "orders")
-@Data
 public class Order {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id", nullable = false)
-    private User user;
-
-    public void setUser(User user) {
-        this.user = user;
-    }
+    private Long userId; // ID de l'utilisateur
 
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<OrderItem> items = new ArrayList<>();
+    private List<OrderItem> items;
 
-    @Column(nullable = false)
-    private String orderType;
-
-    @Column(nullable = false)
     @Enumerated(EnumType.STRING)
-    private OrderState state;
+    private OrderState state; // État de la commande
 
-    @Column(nullable = false)
-    private String deliveryAddress;
+    @Enumerated(EnumType.STRING)
+    private OrderType type; // Type de la commande (cash, credit)
 
-    @Column(nullable = false, precision = 10, scale = 2)
-    private BigDecimal totalAmount;
-
-    @CreationTimestamp
-    @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
-    @UpdateTimestamp
-    @Column(nullable = false)
-    private LocalDateTime updatedAt;
+    // Getters and setters
+    public Long getId() {
+        return id;
+    }
 
-    public boolean canTransitionTo(OrderState newState) {
-        if (state == null) {
-            return true;
-        }
-        return switch (state) {
-            case CREATED -> newState == OrderState.CONFIRMED || newState == OrderState.CANCELLED;
-            case CONFIRMED -> newState == OrderState.IN_PREPARATION || newState == OrderState.CANCELLED;
-            case IN_PREPARATION -> newState == OrderState.READY_FOR_DELIVERY || newState == OrderState.CANCELLED;
-            case READY_FOR_DELIVERY -> newState == OrderState.IN_DELIVERY || newState == OrderState.CANCELLED;
-            case IN_DELIVERY -> newState == OrderState.DELIVERED || newState == OrderState.CANCELLED;
-            case DELIVERED, CANCELLED -> false;
-        };
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public Long getUserId() {
+        return userId;
+    }
+
+    public void setUserId(Long userId) {
+        this.userId = userId;
+    }
+
+    public List<OrderItem> getItems() {
+        return items;
+    }
+
+    public void setItems(List<OrderItem> items) {
+        this.items = items;
+    }
+
+    public OrderState getState() {
+        return state;
+    }
+
+    public void setState(OrderState state) {
+        this.state = state;
+    }
+
+    public OrderType getType() {
+        return type;
+    }
+
+    public void setType(OrderType type) {
+        this.type = type;
+    }
+
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(LocalDateTime createdAt) {
+        this.createdAt = createdAt;
     }
 }
