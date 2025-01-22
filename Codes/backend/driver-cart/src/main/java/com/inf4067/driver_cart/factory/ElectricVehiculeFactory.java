@@ -13,7 +13,7 @@ public class ElectricVehiculeFactory implements VehiculeFactory {
         electricCar.setModel(model);
         electricCar.setPrice(price);
         electricCar.setBatteryCapacity(75); // kWh
-        electricCar.setRange(400); 
+        electricCar.setDrivingRange(400); 
 
         return electricCar;
     }

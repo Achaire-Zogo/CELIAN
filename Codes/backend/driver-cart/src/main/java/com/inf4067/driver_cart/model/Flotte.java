@@ -12,6 +12,9 @@ import jakarta.persistence.InheritanceType;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.Setter;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -19,7 +22,8 @@ import java.util.List;
 @Table(name ="flottes")
 @Inheritance(strategy = InheritanceType.JOINED)
 @AllArgsConstructor
-
+@Getter
+@Setter
 public class Flotte extends Vehicule {
    public Flotte() {
         //TODO Auto-generated constructor stub
@@ -30,9 +34,9 @@ public class Flotte extends Vehicule {
     private Long id;
 
     @Enumerated(EnumType.STRING)
-    public FlotteType type;
+    public FlotteType flotteType;
     
-    @OneToMany(cascade = CascadeType.ALL)
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
     protected List<Vehicule> vehicules = new ArrayList<>();
 
     

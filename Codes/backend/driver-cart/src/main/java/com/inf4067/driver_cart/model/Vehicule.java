@@ -27,7 +27,9 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
     @JsonSubTypes.Type(value = ElectricCar.class, name = "ELECTRIC_CAR"),
     @JsonSubTypes.Type(value = PetrolCar.class, name = "FUEL_CAR"),
     @JsonSubTypes.Type(value = ElectricScooter.class, name = "ELECTRIC_SCOOTER"),
-    @JsonSubTypes.Type(value = PetrolScooter.class, name = "FUEL_SCOOTER")
+    @JsonSubTypes.Type(value = PetrolScooter.class, name = "FUEL_SCOOTER"),
+    @JsonSubTypes.Type(value = Flotte.class, name = "FLEET")
+
 })
 @Data
 @AllArgsConstructor

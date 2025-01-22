@@ -9,6 +9,5 @@ import com.inf4067.driver_cart.model.*;
 
 @Repository
 public interface FlotteRepository extends JpaRepository<Flotte, Long> {
-    List<Flotte> findByType(FlotteType type);
-    List<Flotte> findByOptionsContaining(String option);
+   
 }

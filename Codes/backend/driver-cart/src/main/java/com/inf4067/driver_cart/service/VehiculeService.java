@@ -81,6 +81,8 @@ public class VehiculeService {
         return flotteRepository.save(flotte);
     }
 
+    
+
     public void deleteFlotteById(Long id) {
         flotteRepository.deleteById(id);
     }

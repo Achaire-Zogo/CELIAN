@@ -7,4 +7,5 @@ public enum VehicleType {
     FUEL_SCOOTER,
     CAR,
     SCOOTER,
+    FLEET
 }

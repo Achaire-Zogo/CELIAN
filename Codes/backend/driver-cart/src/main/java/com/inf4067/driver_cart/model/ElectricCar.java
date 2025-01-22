@@ -23,7 +23,7 @@ public  class ElectricCar extends Car {
 
 
     private int batteryCapacity;
-    private int range;
+    private int drivingRange;
 
   
 
