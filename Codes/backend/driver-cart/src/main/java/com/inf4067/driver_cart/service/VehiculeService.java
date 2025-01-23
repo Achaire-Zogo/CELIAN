@@ -16,6 +16,9 @@ public class VehiculeService {
     private VehiculeRepository vehiculeRepository;
 
     @Autowired
+    private FlotteRepository flotteRepository;
+
+    @Autowired
     private CarRepository carRepository;
 
     @Autowired
@@ -74,6 +77,22 @@ public class VehiculeService {
 
     }
 
+    public Flotte saveFlotte(Flotte flotte) {
+        return flotteRepository.save(flotte);
+    }
+
+    
+
+    public void deleteFlotteById(Long id) {
+        flotteRepository.deleteById(id);
+    }
+
+   
+
+    public List<Flotte> getFlottes() {
+        return flotteRepository.findAll();
+    }
+
     public Car saveElectricCar(ElectricCar vehicule) {
         // TODO Auto-generated method stub
         Car car = electricVehiculeFactory.getCar();
@@ -81,6 +100,10 @@ public class VehiculeService {
 
         return carRepository.save(car);
     }
+
+    public Flotte getFlotteById(Long id) {
+        // TODO Auto-generated method stub
+        return flotteRepository.findById(id).orElse(null);}
 
     
 

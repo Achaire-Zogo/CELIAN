@@ -1,7 +1,7 @@
 # CELIAN Driver Cart API
 
 ## Description
-API de gestion de commandes et de paniers pour le projet CELIAN, utilisant Spring Security pour l'authentification et les autorisations.
+API de gestion de commandes et de paniers pour le projet CELIAN, utilisant les patrons de conception Factory Method et State pour une meilleure flexibilité et maintenabilité.
 
 ## Prérequis
 - Java 17
@@ -18,80 +18,38 @@ spring.datasource.password=
 ```
 
 ### Identifiants par défaut
-- Username: `admin@celian.com`
+- Username: `admin`
 - Password: `admin123`
 
 ## Architecture du Projet
 
 ### 1. Gestion des Utilisateurs
+Le système gère trois types d'utilisateurs :
 
-Le système implémente deux niveaux de contrôle :
-
-#### Rôles Utilisateurs
-- **ADMIN** : Accès complet à l'application
-  - Peut voir tous les utilisateurs
-  - Peut supprimer des utilisateurs
-  - Accès à toutes les fonctionnalités
-- **USER** : Accès limité à ses propres ressources
-  - Peut gérer son propre profil
-  - Peut gérer ses paniers et commandes
-
-#### Types de Clients
-- **Personne Physique (INDIVIDUAL)**
-  - Nom et prénom
-  - Numéro de téléphone
-- **Personne Morale (COMPANY)**
-  - Nom de l'entreprise
-  - Numéro d'enregistrement (SIRET/SIREN)
+#### Types d'Utilisateurs
+- **Utilisateur de base** : Informations communes
+- **Client Individuel** : Particuliers
+- **Client Entreprise** : Entreprises avec possibilité de filiales
 
 #### Endpoints Utilisateurs (`/api/v1/users`)
-- `POST /register` : Création d'un compte
-- `GET /` : Liste tous les utilisateurs (ADMIN uniquement)
-- `GET /{id}` : Détails d'un utilisateur (ADMIN ou propriétaire)
-- `PUT /{id}` : Mise à jour d'un utilisateur (ADMIN ou propriétaire)
-- `DELETE /{id}` : Suppression d'un utilisateur (ADMIN uniquement)
-
-#### Exemples de Création de Compte
-
-**Personne Physique :**
-```json
-{
-  "email": "john@example.com",
-  "password": "secret123",
-  "name": "John Doe",
-  "clientType": "INDIVIDUAL",
-  "firstName": "John",
-  "lastName": "Doe",
-  "phoneNumber": "0123456789"
-}
-```
-
-**Personne Morale :**
-```json
-{
-  "email": "contact@company.com",
-  "password": "secret123",
-  "name": "ACME Corp",
-  "clientType": "COMPANY",
-  "companyName": "ACME Corporation",
-  "registrationNumber": "123456789"
-}
-```
+- `POST /register` : Création d'un nouvel utilisateur
+- `POST /individual` : Création d'un client individuel
+- `POST /company` : Création d'un client entreprise
+- `POST /company/{parentId}/subsidiary` : Ajout d'une filiale
+- `GET /company/parent` : Liste des entreprises parentes
+- `GET /company/{parentId}/subsidiaries` : Liste des filiales
 
 ### 2. Gestion du Panier
 
-Chaque panier est strictement lié à un utilisateur spécifique :
+Le panier utilise une structure simple et efficace :
 
 #### Modèle de Panier
 - `Cart` : Contient la liste des articles et le montant total
-  - Lié à un utilisateur spécifique
-  - Traçabilité avec timestamps
 - `CartItem` : Article individuel avec quantité et prix
 
 #### Endpoints Panier (`/api/v1/carts`)
 - `POST /` : Créer un nouveau panier
-- `GET /` : Liste des paniers de l'utilisateur connecté
-- `GET /{cartId}` : Consulter un panier spécifique
+- `GET /{cartId}` : Consulter un panier
 - `POST /{cartId}/items` : Ajouter un article
 - `DELETE /{cartId}/items` : Supprimer un article
 - `DELETE /{cartId}` : Vider le panier
@@ -127,17 +85,12 @@ Les commandes utilisent les patrons Factory Method et State :
 
 ## Flux de Travail Typique
 
-1. **Création d'un Compte**
+1. **Création d'un Client**
    ```http
-   POST /api/v1/users/register
+   POST /api/v1/users/individual
    {
-     "email": "john@example.com",
-     "password": "secret123",
      "name": "John Doe",
-     "clientType": "INDIVIDUAL",
-     "firstName": "John",
-     "lastName": "Doe",
-     "phoneNumber": "0123456789"
+     "email": "john@example.com"
    }
    ```
 
@@ -161,14 +114,13 @@ Les commandes utilisent les patrons Factory Method et State :
    POST /api/v1/orders/from-cart
    {
      "cartId": 1,
+     "clientId": 1,
      "deliveryAddress": "123 Main St"
    }
    ```
 
 ## Sécurité
-- Authentification via Spring Security
-- Tous les endpoints sont sécurisés sauf `/register`
-- Les mots de passe sont hashés avec BCrypt
+- Tous les endpoints sont sécurisés par authentification Basic
 - Swagger UI accessible à : `http://localhost:8080/swagger-ui.html`
 - Documentation OpenAPI à : `http://localhost:8080/v3/api-docs`
 

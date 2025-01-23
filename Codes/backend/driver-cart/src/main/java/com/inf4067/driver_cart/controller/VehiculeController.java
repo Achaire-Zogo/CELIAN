@@ -7,6 +7,9 @@ import org.springframework.web.bind.annotation.*;
 
 import com.inf4067.driver_cart.model.*;
 import com.inf4067.driver_cart.service.VehiculeService;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+
 
 @RestController
 @RequestMapping("/api/vehicules")
@@ -54,6 +57,23 @@ public class VehiculeController {
     public ResponseEntity<Scooter> savePetrolScooter(@RequestBody PetrolScooter vehicule) {
         return ResponseEntity.ok(vehiculeService.savePetrolScooter(vehicule));
     }
+
+    @PostMapping("/flotte")
+    public ResponseEntity<Flotte> saveFlotte(@RequestBody Flotte vehicule) {
+        return ResponseEntity.ok(vehiculeService.saveFlotte(vehicule));
+    }
+
+    @GetMapping("/flotte")
+    public ResponseEntity<List<Flotte>> getFlottes() {
+        return ResponseEntity.ok(vehiculeService.getFlottes());
+    }
+
+    @GetMapping("/flotte/{id}")
+    public ResponseEntity<Flotte> getFlotteById(@PathVariable Long id) {
+        return ResponseEntity.ok(vehiculeService.getFlotteById(id));
+    }
+    
+    
 
     @PutMapping("/{id}")
     public ResponseEntity<Vehicule> updateVehicule(@PathVariable Long id, @RequestBody Vehicule vehicule) {
