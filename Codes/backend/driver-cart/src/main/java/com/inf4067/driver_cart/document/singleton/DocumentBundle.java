@@ -5,10 +5,6 @@ import com.inf4067.driver_cart.document.model.PurchaseOrder;
 import com.inf4067.driver_cart.document.model.RegistrationRequest;
 import com.inf4067.driver_cart.document.model.TransfertCertificate;
 
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.OneToOne;
 import lombok.Data;
 
 @Component
