@@ -1,5 +1,7 @@
 package com.inf4067.driver_cart.order.model;
 
+import com.inf4067.driver_cart.model.Vehicule;
+
 import jakarta.persistence.*;
 import lombok.Data;
 
@@ -19,5 +21,8 @@ public class CartItem {
 
     private int quantity; // Quantité du véhicule
 
+    @Transient // This field won't be persisted in database
+    private Vehicule vehicle; // Complete vehicle information
+    
     // Getters and setters
 }

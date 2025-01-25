@@ -6,6 +6,7 @@ import com.inf4067.driver_cart.order.model.CartItem;
 import com.inf4067.driver_cart.order.model.CartStatus;
 import com.inf4067.driver_cart.order.repository.CartItemRepository;
 import com.inf4067.driver_cart.order.repository.CartRepository;
+import com.inf4067.driver_cart.service.VehiculeService;
 import com.inf4067.driver_cart.user.model.User;
 import com.inf4067.driver_cart.user.service.UserService;
 import jakarta.persistence.EntityNotFoundException;
@@ -20,14 +21,33 @@ public class CartService {
 
     @Autowired
     private CartRepository cartRepository;
+    @Autowired
+    private VehiculeService vehiculeService;
 
     public Cart getOrCreateCart(Long userId) {
-        return cartRepository.findByUserId(userId)
-                .orElseGet(() -> {
-                    Cart cart = new Cart();
-                    cart.setUserId(userId);
-                    return cartRepository.save(cart);
-                });
+        Optional<Cart> existingCart = cartRepository.findByUserId(userId);
+        Cart cart;
+        if (existingCart.isPresent()) {
+            cart = existingCart.get();
+        } else {
+            cart = new Cart();
+            cart.setUserId(userId);
+            cart = cartRepository.save(cart);
+        }
+        
+        // Enrich cart items with vehicle details
+        if (cart.getItems() != null) {
+            cart.getItems().forEach(item -> {
+                try {
+                    item.setVehicle(vehiculeService.getVehiculeById(item.getVehicleId()));
+                } catch (EntityNotFoundException e) {
+                    // Log error but continue processing other items
+                    System.err.println("Vehicle not found for id: " + item.getVehicleId());
+                }
+            });
+        }
+        
+        return cart;
     }
 
     public void addItemToCart(Long userId, Long vehicleId, int quantity) {
