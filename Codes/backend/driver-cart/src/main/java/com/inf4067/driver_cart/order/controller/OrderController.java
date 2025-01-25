@@ -21,6 +21,11 @@ public class OrderController {
         return orderService.createOrderFromCart(userId, type);
     }
 
+    @GetMapping("/user/{userId}")
+    public List<Order> getUserOrders(@PathVariable Long userId) {
+        return orderService.getUserOrders(userId);
+    }
+
     @PutMapping("/{id}/state")
     public Order updateOrderState(@PathVariable Long id, @RequestParam OrderState state) {
         return orderService.updateOrderState(id, state);

@@ -56,6 +56,10 @@ public class OrderService {
         return orderRepository.findAll();
     }
 
+    public List<Order> getUserOrders(Long userId) {
+        return orderRepository.findByUserId(userId);
+    }
+
     public Order getOrderById(Long id) {
         return orderRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Order not found"));
