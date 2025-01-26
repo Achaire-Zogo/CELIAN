@@ -6,8 +6,11 @@ import java.util.Date;
 import com.inf4067.driver_cart.document.adapter.IDocumentFormat;
 import com.inf4067.driver_cart.document.builder.IDocumentBuilder;
 import com.inf4067.driver_cart.document.enumeration.DocumentType;
+import com.inf4067.driver_cart.model.Vehicule;
+import com.inf4067.driver_cart.user.model.User;
 
 import jakarta.persistence.Entity;
+import jakarta.persistence.ManyToOne;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -20,9 +23,11 @@ import lombok.NoArgsConstructor;
 @EqualsAndHashCode(callSuper = false)
 public class RegistrationRequest extends VehicleDocument{
 
-    private String vehicleId;
-    private String ownerInfo; // buyer
-    private String vehicleDetails;
+    @ManyToOne
+    private Vehicule vehicle;
+
+    @ManyToOne
+    private User user; // buyer
 
     @Override
     public void generate(IDocumentBuilder documentBuilder) {
@@ -47,12 +52,27 @@ public class RegistrationRequest extends VehicleDocument{
 
     @Override
     protected String getFormattedContent() {
+        String moreUserInf = """
+                
+                """;
         return String.format("""
                     DEMANDE D'IMMATRICULATION
                     
-                    Véhicule ID: %s
-                    Propriétaire: %s
-                    Détails du véhicule: %s
-                    """, this.getVehicleId(), getOwnerInfo(), getVehicleDetails());
+                    # VEHICULE
+
+                    Nom : %s %s
+                    Type : %s
+                    Prix : %s FCFA
+
+                    # PROPRIETAIRE
+
+                    Nom : %s
+                    email : %s
+                    """, this.getVehicle().getMarque(),
+                        this.getVehicle().getModel(),
+                        this.getVehicle().getType().toString(),
+                        this.getVehicle().getPrice(),
+                        this.getUser().getName(),
+                        this.getUser().getEmail());
     }
 }

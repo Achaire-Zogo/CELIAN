@@ -2,6 +2,10 @@ package com.inf4067.driver_cart.document.adapter;
 
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 import com.inf4067.driver_cart.document.enumeration.DocumentFormat;
 import com.itextpdf.text.DocumentException;
@@ -13,6 +17,17 @@ public class PdfDocumentAdapter extends IDocumentFormat{
     @Override
     public void generatedDocument() {
         this.setFormat(DocumentFormat.PDF);
+
+        // S'assurer que le dossier storage existe deja sinon le creer 
+        Path storagePath = Paths.get("storage");
+        if (!Files.exists(storagePath)) {
+            try {
+                Files.createDirectories(storagePath);
+            } catch (IOException e) {
+            e.printStackTrace();
+            }
+        }
+
         com.itextpdf.text.Document document = new com.itextpdf.text.Document();
         try {
             String path = "storage/" + this.getName() + ".pdf";

@@ -6,8 +6,11 @@ import java.util.Date;
 import com.inf4067.driver_cart.document.adapter.IDocumentFormat;
 import com.inf4067.driver_cart.document.builder.IDocumentBuilder;
 import com.inf4067.driver_cart.document.enumeration.DocumentType;
+import com.inf4067.driver_cart.model.Vehicule;
+import com.inf4067.driver_cart.user.model.User;
 
 import jakarta.persistence.Entity;
+import jakarta.persistence.ManyToOne;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -19,9 +22,13 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = false)
 public class TransfertCertificate extends VehicleDocument {
-    private String vehicleId;
-    private String sellerInfo;
-    private String buyerInfo;
+    
+    @ManyToOne
+    private Vehicule vehicle;
+
+    @ManyToOne
+    private User user; // buyer
+
     private String transferDate;
 
     @Override
@@ -50,10 +57,28 @@ public class TransfertCertificate extends VehicleDocument {
         return String.format("""
             CERTIFICAT DE CESSION
             
-            Véhicule ID: %s
-            Vendeur: %s
-            Acheteur: %s
+            # VEHICULE
+
+            Nom : %s %s
+            Type : %s
+            Prix : %s
+
+            # VENDEUR
+
+            Nom : CELIAN CORP
+
+            # ACHETEUR
+
+            Nom : %s
+            Email : %s
+
             Date de cession: %s
-            """, getVehicleId(), getSellerInfo(), getBuyerInfo(), getTransferDate());
+            """, getVehicle().getMarque(),
+            getVehicle().getModel(),
+            getVehicle().getType(),
+            getVehicle().getPrice(),
+            getUser().getName(),
+            getUser().getEmail(),
+            getTransferDate());
     }
 }
