@@ -14,6 +14,7 @@ public class ElectricVehiculeFactory implements VehiculeFactory {
         electricCar.setPrice(price);
         electricCar.setBatteryCapacity(75); // kWh
         electricCar.setDrivingRange(400); 
+        electricCar.setType(VehicleType.ELECTRIC_CAR);
 
         return electricCar;
     }
@@ -24,6 +25,7 @@ public class ElectricVehiculeFactory implements VehiculeFactory {
         electricScooter.setModel(model);
         electricScooter.setPrice(price);
         electricScooter.setBatteryCapacity(30); // kWh
+        electricScooter.setType(VehicleType.ELECTRIC_SCOOTER);
        
         return electricScooter;
     }

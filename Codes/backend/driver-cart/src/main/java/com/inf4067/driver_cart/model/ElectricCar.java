@@ -13,19 +13,19 @@ import lombok.Setter;
 @Entity
 @Table(name ="electric_cars")
 @AllArgsConstructor
-@NoArgsConstructor
 @Getter
 @Setter
 public  class ElectricCar extends Car {
      @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    public int batteryCapacity;
+    public int drivingRange;
 
+    public ElectricCar(){
+        this.setType(VehicleType.ELECTRIC_CAR);
+    }
 
-    private int batteryCapacity;
-    private int drivingRange;
-
-  
 
    
 }

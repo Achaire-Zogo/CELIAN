@@ -16,6 +16,7 @@ public class PetrolVehiculeFactory implements VehiculeFactory {
         petrolCar.setType(VehicleType.CAR);
         petrolCar.setEngineSize(2000); // cc
         petrolCar.setFuelType(FuelType.GASOLINE);
+        petrolCar.setType(VehicleType.FUEL_CAR);
 
         return petrolCar;
     }
@@ -26,6 +27,7 @@ public class PetrolVehiculeFactory implements VehiculeFactory {
         
         scooter.setEngineSize(125); // cc
         scooter.setFuelType(FuelType.GASOLINE);
+        scooter.setType(VehicleType.FUEL_SCOOTER);
         
         return scooter;
     }
