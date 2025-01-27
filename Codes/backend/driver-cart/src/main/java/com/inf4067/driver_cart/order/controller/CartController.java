@@ -1,6 +1,6 @@
 package com.inf4067.driver_cart.order.controller;
 
-import com.inf4067.driver_cart.order.model.Cart;
+import com.inf4067.driver_cart.order.model.CartItem;
 import com.inf4067.driver_cart.order.service.CartService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,7 +25,7 @@ public class CartController {
     }
 
     @GetMapping
-    public Cart getCart(@RequestParam Long userId) {
-        return cartService.getCart(userId);
+    public CartItem getCart(@RequestParam Long userId) {
+        return cartService.getItemCart(userId);
     }
 }

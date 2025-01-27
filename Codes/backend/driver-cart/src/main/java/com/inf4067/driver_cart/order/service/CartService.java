@@ -1,11 +1,10 @@
 package com.inf4067.driver_cart.order.service;
 
+import com.inf4067.driver_cart.model.Vehicule;
 import com.inf4067.driver_cart.order.dto.AddToCartRequest;
-import com.inf4067.driver_cart.order.model.Cart;
 import com.inf4067.driver_cart.order.model.CartItem;
 import com.inf4067.driver_cart.order.model.CartStatus;
 import com.inf4067.driver_cart.order.repository.CartItemRepository;
-import com.inf4067.driver_cart.order.repository.CartRepository;
 import com.inf4067.driver_cart.service.VehiculeService;
 import com.inf4067.driver_cart.user.model.User;
 import com.inf4067.driver_cart.user.service.UserService;
@@ -13,6 +12,7 @@ import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -20,62 +20,54 @@ import java.util.Optional;
 public class CartService {
 
     @Autowired
-    private CartRepository cartRepository;
+    private CartItemRepository cartItemRepository;
     @Autowired
     private VehiculeService vehiculeService;
 
-    public Cart getOrCreateCart(Long userId) {
-        Optional<Cart> existingCart = cartRepository.findByUserId(userId);
-        Cart cart;
-        if (existingCart.isPresent()) {
-            cart = existingCart.get();
-        } else {
-            cart = new Cart();
-            cart.setUserId(userId);
-            cart = cartRepository.save(cart);
-        }
-        
-        // Enrich cart items with vehicle details
-        if (cart.getItems() != null) {
-            cart.getItems().forEach(item -> {
-                try {
-                    item.setVehicle(vehiculeService.getVehiculeById(item.getVehicleId()));
-                } catch (EntityNotFoundException e) {
-                    // Log error but continue processing other items
-                    System.err.println("Vehicle not found for id: " + item.getVehicleId());
-                }
-            });
-        }
-        
-        return cart;
-    }
-
+   
     public void addItemToCart(Long userId, Long vehicleId, int quantity) {
-        Cart cart = getOrCreateCart(userId);
-        Optional<CartItem> existingItem = cart.getItems().stream()
-                .filter(item -> item.getVehicleId().equals(vehicleId))
-                .findFirst();
+        Optional<CartItem> existingItem = cartItemRepository.findByUserIdAndVehicleIdAndStatus(userId, vehicleId, CartStatus.ACTIVE);
+        CartItem cartItem;
 
         if (existingItem.isPresent()) {
-            existingItem.get().setQuantity(existingItem.get().getQuantity() + quantity);
+            cartItem = existingItem.get();
+            cartItem.setQuantity(cartItem.getQuantity() + quantity);
         } else {
-            CartItem newItem = new CartItem();
-            newItem.setCart(cart);
-            newItem.setVehicleId(vehicleId);
-            newItem.setQuantity(quantity);
-            cart.getItems().add(newItem);
+            cartItem = new CartItem();
+            cartItem.setUserId(userId);
+            cartItem.setVehicleId(vehicleId);
+            cartItem.setQuantity(quantity);
+            cartItem.setStatus(CartStatus.ACTIVE);
         }
 
-        cartRepository.save(cart);
+        cartItemRepository.save(cartItem);
     }
 
     public void removeItemFromCart(Long userId, Long vehicleId) {
-        Cart cart = getOrCreateCart(userId);
-        cart.getItems().removeIf(item -> item.getVehicleId().equals(vehicleId));
-        cartRepository.save(cart);
+        Optional<CartItem> cartItem = cartItemRepository.findByUserIdAndVehicleIdAndStatus(userId, vehicleId, CartStatus.ACTIVE);
+        cartItem.ifPresent(cartItemRepository::delete);
     }
 
-    public Cart getCart(Long userId) {
-        return getOrCreateCart(userId);
+    public CartItem getItemCart(Long userId) {
+        List<CartItem> cartItems = cartItemRepository.findByUserIdAndStatus(userId, CartStatus.ACTIVE);
+        
+        if (cartItems.isEmpty()) {
+            throw new EntityNotFoundException("CartItem not found for user ID: " + userId);
+        }
+        
+        CartItem cartItem = cartItems.get(0); // Get the first item if the list is not empty
+
+        // Fetch complete vehicle information and set it in the cart item
+        Vehicule completeVehicle = fetchCompleteVehicleInfo(cartItem.getVehicleId());
+        cartItem.setVehicle(completeVehicle);
+
+        return cartItem;
+    }
+
+    // Assume this method fetches complete vehicle information based on vehicle ID
+    private Vehicule fetchCompleteVehicleInfo(Long vehicleId) {
+        // Implement the logic to fetch complete vehicle details
+        // This could be a call to another repository or service
+        return vehiculeService.getVehiculeById(vehicleId);
     }
 }
