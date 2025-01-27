@@ -15,14 +15,15 @@ import lombok.NoArgsConstructor;
 @Table(name ="cars")
 @Inheritance(strategy = InheritanceType.JOINED)
 @AllArgsConstructor
-
 public class Car extends Vehicule {
    @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    
     public Car(){
         this.setType(VehicleType.CAR);
     }
+
+    
+    
 }

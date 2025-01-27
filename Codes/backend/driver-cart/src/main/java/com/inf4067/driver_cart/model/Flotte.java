@@ -26,7 +26,7 @@ import java.util.List;
 @Setter
 public class Flotte extends Vehicule {
    public Flotte() {
-        //TODO Auto-generated constructor stub
+      this.setType(VehicleType.FLEET);
     }
 
 @Id

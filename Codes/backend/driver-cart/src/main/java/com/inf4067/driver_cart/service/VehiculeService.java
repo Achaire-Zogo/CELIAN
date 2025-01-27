@@ -23,12 +23,12 @@ public class VehiculeService {
 
     @Autowired
     private ScooterRepository scooterRepository;
-    
-    @Autowired
-    private VehiculeFactory electricVehiculeFactory = new ElectricVehiculeFactory();;
 
-    @Autowired
-    private VehiculeFactory petrolVehiculeFactory = new PetrolVehiculeFactory();;
+    
+    private VehiculeFactory electricFactory = new ElectricVehiculeFactory();;
+
+   
+    private VehiculeFactory petrolFactory = new PetrolVehiculeFactory();;
 
 
 
@@ -52,8 +52,16 @@ public class VehiculeService {
 
     public Scooter savePetrolScooter(PetrolScooter vehicule) {
         // TODO Auto-generated method stub
-        Scooter scooter = petrolVehiculeFactory.getScooter();
-        scooter = vehicule;
+       
+        Scooter scooter = petrolFactory.getScooter();
+        scooter.setMarque(vehicule.marque);
+        scooter.setModel(vehicule.model);
+        scooter.setOptions(vehicule.options);
+        scooter.setPrice(vehicule.price);
+        scooter.setType(VehicleType.FUEL_SCOOTER);
+        scooter.setUri(vehicule.uri);
+        ((PetrolScooter) scooter).setFuelType(vehicule.fuelType);
+        ((PetrolScooter) scooter).setEngineSize(vehicule.engineSize);
 
         return scooterRepository.save(scooter);
 
@@ -61,23 +69,34 @@ public class VehiculeService {
     }
 
     public Scooter saveElectricScooter(ElectricScooter vehicule) {
-        // TODO Auto-generated method stub
-        Scooter scooter = electricVehiculeFactory.getScooter();
-        scooter = vehicule;
+        Scooter scooter = electricFactory.getScooter();
+        scooter.setMarque(vehicule.marque);
+        scooter.setModel(vehicule.model);
+        scooter.setOptions(vehicule.options);
+        scooter.setPrice(vehicule.price);
+        scooter.setType(VehicleType.ELECTRIC_SCOOTER);
+        scooter.setUri(vehicule.uri);
+        ((ElectricScooter) scooter).setBatteryCapacity(vehicule.batteryCapacity);
 
         return scooterRepository.save(scooter);
     }
 
     public Car savePetrolCar(PetrolCar vehicule) {
-        // TODO Auto-generated method stub
-        Car car = petrolVehiculeFactory.getCar();
-        car = vehicule;
+        
+        Car car = petrolFactory.getCar(vehicule.model,vehicule.price);
+        
+        car.setMarque(vehicule.marque);
+        car.setOptions(vehicule.options);
+        car.setUri(vehicule.uri);
+        ((PetrolCar) car).setEngineSize(vehicule.engineSize);
+        ((PetrolCar) car).setFuelType(vehicule.fuelType);
 
-        return carRepository.save(car);
+        return carRepository.save(vehicule);
 
     }
 
     public Flotte saveFlotte(Flotte flotte) {
+        flotte.setType(VehicleType.FLEET);
         return flotteRepository.save(flotte);
     }
 
@@ -94,11 +113,17 @@ public class VehiculeService {
     }
 
     public Car saveElectricCar(ElectricCar vehicule) {
-        // TODO Auto-generated method stub
-        Car car = electricVehiculeFactory.getCar();
-        car = vehicule;
+        Car car = electricFactory.getCar(vehicule.model,vehicule.price);
+        
+        car.setMarque(vehicule.marque);
+        car.setOptions(vehicule.options);
+        car.setUri(vehicule.uri);
+        car.setType(VehicleType.ELECTRIC_CAR);
+        System.out.print("ok create car");
+        ((ElectricCar) car).setBatteryCapacity(vehicule.batteryCapacity);
+        ((ElectricCar) car).setDrivingRange(vehicule.drivingRange);
 
-        return carRepository.save(car);
+        return carRepository.save(vehicule);
     }
 
     public Flotte getFlotteById(Long id) {

@@ -24,7 +24,7 @@ public class ElectricScooter extends Scooter {
 
    
 
-    private int batteryCapacity;
+    public int batteryCapacity;
 
    
 
