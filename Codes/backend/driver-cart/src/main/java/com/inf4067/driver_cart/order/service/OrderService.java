@@ -2,6 +2,8 @@ package com.inf4067.driver_cart.order.service;
 
 import com.inf4067.driver_cart.order.model.CartItem;
 import com.inf4067.driver_cart.order.model.CartStatus;
+import com.inf4067.driver_cart.document.enumeration.DocumentFormat;
+import com.inf4067.driver_cart.observer.Subject;
 import com.inf4067.driver_cart.order.model.Order;
 import com.inf4067.driver_cart.order.model.OrderItem;
 import com.inf4067.driver_cart.order.state.OrderState;
@@ -12,12 +14,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
 @Transactional
-public class OrderService {
+public class OrderService extends Subject {
 
     @Autowired
     private OrderRepository orderRepository;
@@ -48,7 +53,8 @@ public class OrderService {
         
         // Save the updated cart items
         cartItemRepository.saveAll(activeCartItems);
-        
+        // Communiquer avec les observateurs
+        this.notifyObservers(order, DocumentFormat.HTML);
         return savedOrder;
     }
 
