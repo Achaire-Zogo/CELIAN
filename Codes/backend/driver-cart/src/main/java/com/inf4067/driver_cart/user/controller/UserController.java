@@ -65,4 +65,6 @@ public class UserController {
     public ResponseEntity<User> getProfile(@RequestHeader("Authorization") String token) {
         return ResponseEntity.ok(userService.getCurrentUser(token));
     }
+
+    
 }

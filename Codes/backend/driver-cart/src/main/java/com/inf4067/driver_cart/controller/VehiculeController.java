@@ -8,7 +8,6 @@ import org.springframework.web.bind.annotation.*;
 import com.inf4067.driver_cart.model.*;
 import com.inf4067.driver_cart.service.VehiculeService;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 
 
 @RestController
@@ -39,13 +38,13 @@ public class VehiculeController {
     }
 
     @PostMapping("/electric/car")
-    public ResponseEntity<Car> saveElectricCar(@RequestBody ElectricCar vehicule) {
-        return ResponseEntity.ok(vehiculeService.saveElectricCar(vehicule));
+    public ResponseEntity<ElectricCar> saveElectricCar(@RequestBody ElectricCar vehicule) {
+        return ResponseEntity.ok((ElectricCar) vehiculeService.saveElectricCar(vehicule));
     }
 
     @PostMapping("/petrol/car")
     public ResponseEntity<Car> savePetrolCar(@RequestBody PetrolCar vehicule) {
-        return ResponseEntity.ok(vehiculeService.savePetrolCar(vehicule));
+        return ResponseEntity.ok((PetrolCar) vehiculeService.savePetrolCar(vehicule));
     }
 
     @PostMapping("/electric/scooter")

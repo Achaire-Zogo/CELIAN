@@ -25,10 +25,10 @@ public class PetrolCar extends Car {
     private Long id;
 
    
-    private int engineSize;
+    public int engineSize;
 
     @Enumerated(EnumType.STRING)
-    private FuelType fuelType;
+    public FuelType fuelType;
 
 
 }

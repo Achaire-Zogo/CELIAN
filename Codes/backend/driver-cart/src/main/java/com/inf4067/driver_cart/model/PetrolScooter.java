@@ -24,10 +24,10 @@ public class PetrolScooter extends Scooter {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private int engineSize;
+    public int engineSize;
     
     @Enumerated(EnumType.STRING)
-    private FuelType fuelType;
+    public FuelType fuelType;
 
    
    

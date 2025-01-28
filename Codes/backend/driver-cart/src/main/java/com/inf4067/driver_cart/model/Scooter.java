@@ -20,7 +20,7 @@ public class Scooter extends Vehicule {
     private Long id;
 
     public Scooter(){
-        this.setType(VehicleType.SCOOTER);
+      
 
     }
 }
