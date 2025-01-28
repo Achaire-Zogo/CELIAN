@@ -5,7 +5,6 @@ import com.inf4067.driver_cart.order.model.CartStatus;
 import com.inf4067.driver_cart.document.enumeration.DocumentFormat;
 import com.inf4067.driver_cart.observer.Subject;
 import com.inf4067.driver_cart.order.model.Order;
-import com.inf4067.driver_cart.order.model.OrderItem;
 import com.inf4067.driver_cart.order.state.OrderState;
 import com.inf4067.driver_cart.order.model.OrderType;
 import com.inf4067.driver_cart.order.repository.OrderRepository;
@@ -14,11 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
 
 @Service
 @Transactional
