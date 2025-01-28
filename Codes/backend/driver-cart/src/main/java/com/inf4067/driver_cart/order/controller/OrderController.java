@@ -17,8 +17,8 @@ public class OrderController {
     private OrderService orderService;
 
     @PostMapping
-    public Order createOrder(@RequestParam Long userId, @RequestParam OrderType type) {
-        return orderService.createOrderFromCart(userId, type);
+    public Order createOrder(@RequestParam Long userId, @RequestParam OrderType type, @RequestParam Long countryId) {
+        return orderService.createOrderFromCart(userId, type, countryId);
     }
 
     @GetMapping("/user/{userId}")

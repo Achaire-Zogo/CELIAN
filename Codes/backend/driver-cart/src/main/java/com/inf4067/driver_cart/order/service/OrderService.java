@@ -2,18 +2,22 @@ package com.inf4067.driver_cart.order.service;
 
 import com.inf4067.driver_cart.order.model.CartItem;
 import com.inf4067.driver_cart.order.model.CartStatus;
+import com.inf4067.driver_cart.country.model.Country;
 import com.inf4067.driver_cart.document.enumeration.DocumentFormat;
+import com.inf4067.driver_cart.model.Vehicule;
 import com.inf4067.driver_cart.observer.Subject;
 import com.inf4067.driver_cart.order.model.Order;
 import com.inf4067.driver_cart.order.state.OrderState;
 import com.inf4067.driver_cart.order.model.OrderType;
 import com.inf4067.driver_cart.order.repository.OrderRepository;
 import com.inf4067.driver_cart.order.repository.CartItemRepository;
+import com.inf4067.driver_cart.repository.VehiculeRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 import java.util.List;
+import com.inf4067.driver_cart.country.repository.CountryRepository;
 
 @Service
 @Transactional
@@ -25,16 +29,40 @@ public class OrderService extends Subject {
     @Autowired
     private CartItemRepository cartItemRepository;
 
-    public Order createOrderFromCart(Long userId, OrderType type) {
+    @Autowired
+    private CountryRepository countryRepository;
+
+    @Autowired
+    private VehiculeRepository vehicleRepository;
+
+    public Order createOrderFromCart(Long userId, OrderType type, Long countryId) {
         // Retrieve all active cart items for the user
         List<CartItem> activeCartItems = cartItemRepository.findByUserIdAndStatus(userId, CartStatus.ACTIVE);
-        
+    
+        // Fetch the country's tax rate
+        Country country = countryRepository.findById(countryId).orElseThrow(() -> new RuntimeException("Country not found"));
+        double taxRate = country.getTaxRate();
+    
+        // Calculate the total tax for the cart items
+        double totalTax = 0.0;
+        for (CartItem cartItem : activeCartItems) {
+            // Ensure vehicle details are populated
+            Vehicule vehicle = fetchVehicleDetails(cartItem.getVehicleId());
+            cartItem.setVehicle(vehicle);
+    
+            // Calculate tax based on vehicle price
+            double itemTax = vehicle.getPrice() * taxRate * cartItem.getQuantity();
+            totalTax += itemTax;
+        }
+    
         // Create the order
         Order order = new Order();
         order.setUserId(userId);
         order.setType(type);
         order.setState(OrderState.CREATED);
         order.setCreatedAt(LocalDateTime.now());
+        order.setCountryId(countryId);
+        order.setTotal(totalTax); // Set the calculated total tax
     
         // Save the order to get the generated orderId
         Order savedOrder = orderRepository.save(order);
@@ -45,12 +73,21 @@ public class OrderService extends Subject {
             cartItem.setStatus(CartStatus.ORDERED);
             cartItem.setOrderId(orderId);
         }
-        
+    
         // Save the updated cart items
         cartItemRepository.saveAll(activeCartItems);
-        // Communiquer avec les observateurs
+    
+        // Communicate with observers
         this.notifyObservers(order, DocumentFormat.HTML);
+    
         return savedOrder;
+    }
+
+    // Example method to fetch vehicle details
+    private Vehicule fetchVehicleDetails(Long vehicleId) {
+        // Implement logic to fetch vehicle details from the database or service
+        return vehicleRepository.findById(vehicleId).orElseThrow(() -> new RuntimeException("Vehicle not found"));
+        
     }
 
     public Order updateOrderState(Long orderId, OrderState state) {
