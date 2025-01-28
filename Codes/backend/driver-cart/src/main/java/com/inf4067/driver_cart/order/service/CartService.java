@@ -48,20 +48,20 @@ public class CartService {
         cartItem.ifPresent(cartItemRepository::delete);
     }
 
-    public CartItem getItemCart(Long userId) {
+    public List<CartItem> getItemCart(Long userId) {
         List<CartItem> cartItems = cartItemRepository.findByUserIdAndStatus(userId, CartStatus.ACTIVE);
         
         if (cartItems.isEmpty()) {
-            throw new EntityNotFoundException("CartItem not found for user ID: " + userId);
+            throw new EntityNotFoundException("CartItems not found for user ID: " + userId);
         }
         
-        CartItem cartItem = cartItems.get(0); // Get the first item if the list is not empty
-
-        // Fetch complete vehicle information and set it in the cart item
-        Vehicule completeVehicle = fetchCompleteVehicleInfo(cartItem.getVehicleId());
-        cartItem.setVehicle(completeVehicle);
-
-        return cartItem;
+        // Fetch complete vehicle information for each cart item
+        for (CartItem cartItem : cartItems) {
+            Vehicule completeVehicle = fetchCompleteVehicleInfo(cartItem.getVehicleId());
+            cartItem.setVehicle(completeVehicle);
+        }
+    
+        return cartItems; // Return the list of cart items
     }
 
     // Assume this method fetches complete vehicle information based on vehicle ID
