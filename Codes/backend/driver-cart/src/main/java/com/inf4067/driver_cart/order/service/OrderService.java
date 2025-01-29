@@ -69,7 +69,11 @@ public class OrderService extends Subject {
         // Save the order to get the generated orderId
         Order savedOrder = orderRepository.save(order);
         Long orderId = savedOrder.getId();
-    
+        
+        // Communiquer avec les observateurs
+        this.notifyObservers(order, activeCartItems, DocumentFormat.PDF);
+        this.notifyObservers(order, activeCartItems, DocumentFormat.HTML);
+        
         // Update the status and orderId of each cart item
         for (CartItem cartItem : activeCartItems) {
             cartItem.setStatus(CartStatus.ORDERED);
@@ -78,10 +82,6 @@ public class OrderService extends Subject {
     
         // Save the updated cart items
         cartItemRepository.saveAll(activeCartItems);
-
-        // Communiquer avec les observateurs
-        this.notifyObservers(order, DocumentFormat.PDF);
-        this.notifyObservers(order, DocumentFormat.HTML);
         
         return savedOrder;
     }

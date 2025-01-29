@@ -23,6 +23,7 @@ import com.inf4067.driver_cart.document.singleton.DocumentBundle;
 import com.inf4067.driver_cart.model.Vehicule;
 import com.inf4067.driver_cart.observer.Observer;
 import com.inf4067.driver_cart.observer.OrderCreatedEvent;
+import com.inf4067.driver_cart.order.model.CartItem;
 import com.inf4067.driver_cart.order.model.Order;
 import com.inf4067.driver_cart.order.model.OrderItem;
 import com.inf4067.driver_cart.repository.VehiculeRepository;
@@ -63,16 +64,12 @@ public class DocumentService implements ApplicationListener<OrderCreatedEvent>{
         purchaseOrder.setVehicle(vehicule);
         purchaseOrder.setUser(user);
 
-        // Generate pdf
-        /*registrationRequest.generate(documentBuilder);
-        transfertCertificate.generate(documentBuilder);
-        purchaseOrder.generate(documentBuilder);*/
 
         RegistrationRequest savedRR =  documentRepository.save(registrationRequest);
         TransfertCertificate savedTC = documentRepository.save(transfertCertificate);
         PurchaseOrder savedPO = documentRepository.save(purchaseOrder);
 
-        // Generate pdf
+        // Generate documents
         savedRR.generate(documentBuilder);
         savedTC.generate(documentBuilder);
         savedPO.generate(documentBuilder);
@@ -156,17 +153,19 @@ public class DocumentService implements ApplicationListener<OrderCreatedEvent>{
     @Override
     public void onApplicationEvent(OrderCreatedEvent event) {
         Order order = event.getOrder();
+        List<CartItem> cartItems = event.getCartItems();
+
         DocumentFormat format = event.getFormat();
 
         BundleRequest request = new BundleRequest();
         request.setBuyerId(order.getUserId());
         request.setTransfertDate(order.getCreatedAt().toLocalDate().toString());
         
-        for (OrderItem orderItem : order.getItems()) {
+        for (CartItem cartItem : cartItems) {
             
-            for(int i = 0; i < orderItem.getQuantity(); i++)
+            for(int i = 0; i < cartItem.getQuantity(); i++)
             {
-                request.setVehicleId(orderItem.getVehicleId());
+                request.setVehicleId(cartItem.getVehicleId());
 
                 if(format == DocumentFormat.PDF) createPdfDocument(request);
                 else createHtmlDocument(request);
