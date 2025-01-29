@@ -1,7 +1,5 @@
 package com.inf4067.driver_cart.observer;
 
-import java.util.ArrayList;
-import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;

@@ -27,6 +27,11 @@ public class CartController {
         cartService.removeItemFromCart(userId, vehicleId);
     }
 
+    @PostMapping("/update_cart_quantity")
+    public void updateCartQuantity(@RequestParam Long cartId, @RequestParam int quantity) {
+        cartService.updateCartQuantity(cartId, quantity);
+    }
+
     @GetMapping
     public List<CartItem> getCart(@RequestParam Long userId) {
         return cartService.getItemCart(userId);

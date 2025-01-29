@@ -48,6 +48,11 @@ public class CartService {
         cartItem.ifPresent(cartItemRepository::delete);
     }
 
+    public void updateCartQuantity(Long cartId, int quantity) {
+        Optional<CartItem> cartItem = cartItemRepository.findById(cartId);
+        cartItem.ifPresent(item -> item.setQuantity(quantity));
+    }
+
     public List<CartItem> getItemCart(Long userId) {
         List<CartItem> cartItems = cartItemRepository.findByUserIdAndStatus(userId, CartStatus.ACTIVE);
         
