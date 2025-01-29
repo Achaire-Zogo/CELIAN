@@ -78,7 +78,7 @@ public class OrderService extends Subject {
         cartItemRepository.saveAll(activeCartItems);
     
         // Communicate with observers
-        this.notifyObservers(order, DocumentFormat.HTML);
+        //this.notifyObservers(order, DocumentFormat.HTML);
     
         return savedOrder;
     }
