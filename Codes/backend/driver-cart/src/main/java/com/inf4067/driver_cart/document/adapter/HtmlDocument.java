@@ -3,6 +3,9 @@ package com.inf4067.driver_cart.document.adapter;
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 import org.springframework.stereotype.Component;
 
@@ -25,6 +28,15 @@ public class HtmlDocument extends IDocumentFormat{
                                 "</body>\n" +
                                 "</html>";
 
+        // S'assurer que le dossier storage existe deja, sinon le creer
+        Path storagePath = Paths.get("storage");
+        if (!Files.exists(storagePath)) {
+            try {
+                Files.createDirectories(storagePath);
+            } catch (IOException e) {
+            e.printStackTrace();
+            }
+        }
         //try (BufferedWriter writer = new BufferedWriter(new FileWriter("../storage/" + this.getName() + ".html"))) {
         String path = "storage/" + this.getName() + ".html";
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(path))) {

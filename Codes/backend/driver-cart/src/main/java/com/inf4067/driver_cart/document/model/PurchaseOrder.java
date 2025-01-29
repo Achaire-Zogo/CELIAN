@@ -6,8 +6,11 @@ import java.util.Date;
 import com.inf4067.driver_cart.document.adapter.IDocumentFormat;
 import com.inf4067.driver_cart.document.builder.IDocumentBuilder;
 import com.inf4067.driver_cart.document.enumeration.DocumentType;
+import com.inf4067.driver_cart.model.Vehicule;
+import com.inf4067.driver_cart.user.model.User;
 
 import jakarta.persistence.Entity;
+import jakarta.persistence.ManyToOne;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -19,12 +22,12 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = false)
 public class PurchaseOrder extends VehicleDocument {
-    //private String orderId;
-    private String customerInfo;
-    private String vehicleDetails;
-    private String price;
-    //private List<String> options;
-    private String options;
+
+    @ManyToOne
+    private Vehicule vehicle;
+
+    @ManyToOne
+    private User user; // buyer
 
     @Override
     public void generate(IDocumentBuilder documentBuilder) {
@@ -49,14 +52,37 @@ public class PurchaseOrder extends VehicleDocument {
 
     @Override
     protected String getFormattedContent() {
-        return String.format("""
-            BON DE COMMANDE N°%s
 
-            Client: %s
-            Véhicule: %s
-            Prix: %s
-            Options: %s
-            """, getId(), getCustomerInfo(), getVehicleDetails(), getPrice(), getOptions());
+        long timestamp = System.currentTimeMillis();
+        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
+        String dateFormatted = sdf.format(new Date(timestamp));
+
+        return String.format("""
+            COMMANDE N°000%s DU %s
+
+            # CLIENT
+
+            Nom : %s
+            Email : %s
+
+            # VEHICULE
+            
+            Nom : %s %s
+            Type : %s
+            Prix : %s FCFA
+            Options: 
+                - %s
+            """, getId(),
+            dateFormatted,
+            getUser().getName(),
+            getUser().getEmail(),
+            
+            getVehicle().getMarque(),
+            getVehicle().getModel(),
+            getVehicle().getType(),
+            getVehicle().getPrice(),
+            String.join(
+                "\n\t-", getVehicle().getOptions()));
             //String.join(", ", getOptions()));
     }
 

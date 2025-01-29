@@ -14,6 +14,10 @@ public class Order {
 
     private Long userId; // ID de l'utilisateur
 
+    private Long countryId; // ID de du pays    
+
+    private double total;
+
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<OrderItem> items;
 
@@ -25,6 +29,8 @@ public class Order {
 
     private LocalDateTime createdAt;
 
+
+    
     // Getters and setters
     public Long getId() {
         return id;
@@ -73,4 +79,22 @@ public class Order {
     public void setCreatedAt(LocalDateTime createdAt) {
         this.createdAt = createdAt;
     }
+
+    public void setCountryId(Long countryId) {
+        this.countryId = countryId;
+    }
+
+    public Long getCountryId() {
+        return countryId;
+    }
+
+    public void setTotal(double total) {
+        this.total = total;
+    }
+
+    public double getTotal() {
+        return total;
+    }
+
+   
 }
