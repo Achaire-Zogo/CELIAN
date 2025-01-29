@@ -2,7 +2,6 @@ package com.inf4067.driver_cart.order.service;
 
 import com.inf4067.driver_cart.document.enumeration.DocumentFormat;
 import com.inf4067.driver_cart.observer.Subject;
-import com.inf4067.driver_cart.order.model.Cart;
 import com.inf4067.driver_cart.order.model.CartItem;
 import com.inf4067.driver_cart.order.model.CartStatus;
 import com.inf4067.driver_cart.order.model.Order;
