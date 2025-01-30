@@ -48,10 +48,14 @@ public class DocumentService implements ApplicationListener<OrderCreatedEvent>{
         Vehicule vehicule = vehiculeService.getVehiculeById(request.getVehicleId());
         User user = userService.getUser(request.getBuyerId());
 
+        // Set Document Order
+        
         // Set datas for RegistrationRequest
         RegistrationRequest registrationRequest = new RegistrationRequest();
         registrationRequest.setVehicle(vehicule);
         registrationRequest.setUser(user);
+
+        registrationRequest.setOrderId(request.getOrderId());
 
         // Set Datas for TransfertCertificate
         TransfertCertificate transfertCertificate = new TransfertCertificate();
@@ -59,10 +63,14 @@ public class DocumentService implements ApplicationListener<OrderCreatedEvent>{
         transfertCertificate.setUser(user);
         transfertCertificate.setTransferDate(request.getTransfertDate());
 
+        transfertCertificate.setOrderId(request.getOrderId());
+
         // Set Datas for purchase Order
         PurchaseOrder purchaseOrder = new PurchaseOrder();
         purchaseOrder.setVehicle(vehicule);
         purchaseOrder.setUser(user);
+
+        purchaseOrder.setOrderId(request.getOrderId());
 
 
         RegistrationRequest savedRR =  documentRepository.save(registrationRequest);
@@ -106,6 +114,10 @@ public class DocumentService implements ApplicationListener<OrderCreatedEvent>{
 
     public List<VehicleDocument> getAllDocuments() {
         return documentRepository.findAll();
+    }
+
+    public List<VehicleDocument> getDocumentsByOrder(long orderId) {
+        return documentRepository.findByOrderId(orderId);
     }
 
     public List<VehicleDocument> getHtmlDocuments() {
@@ -158,6 +170,8 @@ public class DocumentService implements ApplicationListener<OrderCreatedEvent>{
         DocumentFormat format = event.getFormat();
 
         BundleRequest request = new BundleRequest();
+        
+        request.setOrderId(order.getId());
         request.setBuyerId(order.getUserId());
         request.setTransfertDate(order.getCreatedAt().toLocalDate().toString());
         

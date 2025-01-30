@@ -71,8 +71,8 @@ public class OrderService extends Subject {
         Long orderId = savedOrder.getId();
         
         // Communiquer avec les observateurs
-        this.notifyObservers(order, activeCartItems, DocumentFormat.PDF);
-        this.notifyObservers(order, activeCartItems, DocumentFormat.HTML);
+        this.notifyObservers(savedOrder, activeCartItems, DocumentFormat.PDF);
+        this.notifyObservers(savedOrder, activeCartItems, DocumentFormat.HTML);
         
         // Update the status and orderId of each cart item
         for (CartItem cartItem : activeCartItems) {

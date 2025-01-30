@@ -11,4 +11,7 @@ import com.inf4067.driver_cart.document.model.VehicleDocument;
 public interface VehicleDocumentRepository extends JpaRepository<VehicleDocument, Long> {
     List<VehicleDocument> findByDocumentFormat(DocumentFormat format);
     List<VehicleDocument> findByDocumentType(DocumentType type);
+
+
+    List<VehicleDocument> findByOrderId(long orderId);
 }
