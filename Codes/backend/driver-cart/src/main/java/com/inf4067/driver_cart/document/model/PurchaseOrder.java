@@ -33,7 +33,12 @@ public class PurchaseOrder extends VehicleDocument {
     public void generate(IDocumentBuilder documentBuilder) {
 
         long timestamp = System.currentTimeMillis();
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy_MM_dd_HHmmss");
+        try {
+            Thread.sleep(1); // Sleep for 1 millisecond to ensure unique timestamp
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy_MM_dd_HHmmssSSS");
         String dateFormatted = sdf.format(new Date(timestamp));
 
         documentBuilder.setName(dateFormatted + "_bon_commande");
