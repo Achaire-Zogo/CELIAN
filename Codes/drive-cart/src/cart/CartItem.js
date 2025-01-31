@@ -1,134 +1,192 @@
-import {React, useState} from 'react';
-import { Card, IconButton, ButtonGroup, Button } from '@mui/material';
+import React, { useState } from 'react';
+import {
+  Card,
+  CardActions,
+  CardContent,
+  Typography,
+  IconButton,
+  ButtonGroup,
+  Button,
+  Box,
+  Stack,
+} from '@mui/material';
 import { useSelector, useDispatch } from 'react-redux';
-import CardActions from '@mui/material/CardActions';
-import CardContent from '@mui/material/CardContent';
-import Typography from '@mui/material/Typography';
 import RemoveShoppingCartIcon from '@mui/icons-material/RemoveShoppingCart';
 import AddIcon from '@mui/icons-material/Add';
 import RemoveIcon from '@mui/icons-material/Remove';
-import ImageList from '@mui/material/ImageList';
-import ImageListItem from '@mui/material/ImageListItem';
-import { removeCart, updateCartQuantity } from '../api-endpoints/endpoints'; // Assuming you have an API to update quantity
+import Slider from 'react-slick';
+import 'slick-carousel/slick/slick.css';
+import 'slick-carousel/slick/slick-theme.css';
+import { removeCart, updateCartQuantity } from '../api-endpoints/endpoints';
 import { authActions } from '../store';
 
 function CartItem(props) {
-    const { id, vehicle, vehicleId, quantity } = props.items;
-    const isLoggedIn = useSelector(state => state.isLoggedIn);
-    const [qty, setQty] = useState(quantity);
-    const dispatch = useDispatch();
+  const { id, vehicle, vehicleId, quantity } = props.items;
+  const isLoggedIn = useSelector((state) => state.isLoggedIn);
+  const [qty, setQty] = useState(quantity);
+  const dispatch = useDispatch();
 
-    const onDataReceived = (data) => {
-        dispatch(authActions.removeItem());
-    };
+  const onDataReceived = (data) => {
+    dispatch(authActions.removeItem());
+  };
 
-    const removeFromCart = (e) => {
-        e.preventDefault();
-        if (isLoggedIn) {
-            removeCart(vehicleId).then((data) => onDataReceived(data)).catch((err) => console.log(err));
-        } else {
-            console.log("Not LoggedIn please login or create an account !!");
-        }
-    };
+  const removeFromCart = (e) => {
+    e.preventDefault();
+    if (isLoggedIn) {
+      removeCart(vehicleId)
+        .then((data) => onDataReceived(data))
+        .catch((err) => console.log(err));
+    } else {
+      console.log('Not LoggedIn. Please login or create an account!');
+    }
+  };
 
-    const updateQuantity = (newQuantity) => {
-        if (isLoggedIn) {
-            updateCartQuantity(id, newQuantity) // Assuming you have an API to update quantity
-                .then((data) => {
-                    setQty(newQuantity);
-                    // Dispatch an action to update the quantity in the Redux store
-                    //dispatch(authActions.updateItemQuantity({ vehicleId, quantity: newQuantity }));
-                })
-                .catch((err) => console.log(err));
-        } else {
-            console.log("Not LoggedIn please login or create an account !!");
-        }
-    };
+  const updateQuantity = (newQuantity) => {
+    if (isLoggedIn) {
+      updateCartQuantity(id, newQuantity)
+        .then((data) => {
+          setQty(newQuantity);
+          // Dispatch an action to update the quantity in the Redux store
+          // dispatch(authActions.updateItemQuantity({ vehicleId, quantity: newQuantity }));
+        })
+        .catch((err) => console.log(err));
+    } else {
+      console.log('Not LoggedIn. Please login or create an account!');
+    }
+  };
 
-    const increaseQuantity = () => {
-        const newQuantity = qty + 1;
-        updateQuantity(newQuantity);
-    };
+  const increaseQuantity = () => {
+    const newQuantity = qty + 1;
+    updateQuantity(newQuantity);
+  };
 
-    const decreaseQuantity = () => {
-        if (qty > 1) {
-            const newQuantity = qty - 1;
-            updateQuantity(newQuantity);
-        }
-    };
+  const decreaseQuantity = () => {
+    if (qty > 1) {
+      const newQuantity = qty - 1;
+      updateQuantity(newQuantity);
+    }
+  };
 
-    return (
-        <Card sx={{ width: 345, height: 400, display: 'flex', flexDirection: 'column' }}>
-            <ImageList cols={2} sx={{ width: '100%', height: 235, transform: 'translateZ(0)' }} rowHeight={200} gap={1}>
-                {vehicle.type === 'FLEET' ? vehicle.vehicules.map((item, index) => {
-                    let isLast = (index + 1) % 3 === 0 && vehicle.vehicules.length % 2 === 1;
-                    let cols = isLast ? 2 : 1;
-                    let rows = 1;
-                    return isLast ? (
-                        <ImageListItem key={item.uri} cols={cols} rows={rows}>
-                            <img
-                                srcSet={`${item.uri}?w=174&h=200&fit=crop&auto=format&dpr=2 2x`}
-                                src={`${item.uri}?w=174&h=200&fit=crop&auto=format`}
-                                alt={item.marque}
-                                loading="lazy"
-                            />
-                        </ImageListItem>
-                    ) : (
-                        <ImageListItem key={item.uri}>
-                            <img
-                                srcSet={`${item.uri}?w=174&h=200&fit=crop&auto=format&dpr=2 2x`}
-                                src={`${item.uri}?w=174&h=200&fit=crop&auto=format`}
-                                alt={item.marque}
-                                loading="lazy"
-                            />
-                        </ImageListItem>
-                    );
-                }) : (
-                    <ImageListItem key={vehicle.uri} cols={2} rows={1}>
-                        <img
-                            srcSet={`${vehicle.uri}?w=200&h=200&fit=crop&auto=format&dpr=2 2x`}
-                            src={`${vehicle.uri}?w=200&h=200&fit=crop&auto=format`}
-                            alt={vehicle.marque}
-                            loading="lazy"
-                        />
-                    </ImageListItem>
-                )}
-            </ImageList>
-            <CardContent sx={{ flexGrow: 1 }}>
-                <Typography gutterBottom variant="h6" component="div">
-                    {vehicle.marque}
-                </Typography>
-                <Typography variant="body1" color="text.secondary">
-                    Quantity: {qty}
-                </Typography>
-            </CardContent>
-            <CardActions sx={{ justifyContent: 'space-between', alignItems: 'center' }}>
-                <ButtonGroup size="small" aria-label="quantity control">
-                    <Button
-                        aria-label="reduce quantity"
-                        onClick={decreaseQuantity}
-                        disabled={qty <= 1}
-                    >
-                        <RemoveIcon />
-                    </Button>
-                    <Button
-                        aria-label="increase quantity"
-                        onClick={increaseQuantity}
-                    >
-                        <AddIcon />
-                    </Button>
-                </ButtonGroup>
-                <IconButton
-                    size="small"
-                    aria-label="remove to cart"
-                    color="error"
-                    onClick={(e) => removeFromCart(e)}
+  // Slider settings for fleets
+  const sliderSettings = {
+    dots: true,
+    infinite: true,
+    speed: 500,
+    slidesToShow: 1,
+    slidesToScroll: 1,
+    autoplay: true,
+    autoplaySpeed: 3000,
+    arrows: true,
+  };
+
+  return (
+    <Card
+      sx={{
+        width: 345,
+        height: 'auto',
+        display: 'flex',
+        flexDirection: 'column',
+        borderRadius: 2,
+        boxShadow: 3,
+        transition: 'transform 0.2s',
+        '&:hover': {
+          transform: 'scale(1.02)',
+        },
+      }}
+    >
+      {/* Slider for Fleets or Single Image for Other Vehicles */}
+      <Box sx={{ width: '100%', height: 235, overflow: 'hidden', borderRadius: '8px 8px 0 0' }}>
+        {vehicle.type === 'FLEET' ? (
+          <Slider {...sliderSettings}>
+            {vehicle.vehicules.map((item, index) => (
+              <Box key={index} sx={{ height: 235, position: 'relative' }}>
+                <img
+                  src={item.uri}
+                  alt={item.marque}
+                  style={{
+                    width: '100%',
+                    height: '100%',
+                    objectFit: 'cover',
+                    borderRadius: '8px 8px 0 0',
+                  }}
+                />
+                <Typography
+                  variant="subtitle2"
+                  sx={{
+                    position: 'absolute',
+                    bottom: 8,
+                    left: 8,
+                    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+                    color: 'white',
+                    padding: '4px 8px',
+                    borderRadius: 2,
+                  }}
                 >
-                    <RemoveShoppingCartIcon />
-                </IconButton>
-            </CardActions>
-        </Card>
-    );
+                  {item.marque} {item.model}
+                </Typography>
+              </Box>
+            ))}
+          </Slider>
+        ) : (
+          <img
+            src={vehicle.uri}
+            alt={vehicle.marque}
+            style={{
+              width: '100%',
+              height: '100%',
+              objectFit: 'cover',
+              borderRadius: '8px 8px 0 0',
+            }}
+          />
+        )}
+      </Box>
+
+      <CardContent sx={{ flexGrow: 1 }}>
+        <Typography gutterBottom variant="h6" component="div" sx={{ fontWeight: 'bold' }}>
+          {vehicle.marque} {vehicle.model}
+        </Typography>
+        <Typography variant="body1" color="text.secondary" sx={{ mb: 2 }}>
+          <strong>Quantity:</strong> {qty}
+        </Typography>
+      </CardContent>
+      <CardActions
+        sx={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          p: 2,
+          backgroundColor: '#f5f5f5',
+        }}
+      >
+        <ButtonGroup size="small" aria-label="quantity control">
+          <Button
+            aria-label="reduce quantity"
+            onClick={decreaseQuantity}
+            disabled={qty <= 1}
+            sx={{ backgroundColor: 'primary.main', color: 'white', '&:hover': { backgroundColor: 'primary.dark' } }}
+          >
+            <RemoveIcon />
+          </Button>
+          <Button
+            aria-label="increase quantity"
+            onClick={increaseQuantity}
+            sx={{ backgroundColor: 'primary.main', color: 'white', '&:hover': { backgroundColor: 'primary.dark' } }}
+          >
+            <AddIcon />
+          </Button>
+        </ButtonGroup>
+        <IconButton
+          size="small"
+          aria-label="remove from cart"
+          color="error"
+          onClick={removeFromCart}
+          sx={{ backgroundColor: 'error.main', color: 'white', '&:hover': { backgroundColor: 'error.dark' } }}
+        >
+          <RemoveShoppingCartIcon />
+        </IconButton>
+      </CardActions>
+    </Card>
+  );
 }
 
 export default CartItem;

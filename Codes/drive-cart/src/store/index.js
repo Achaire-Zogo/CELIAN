@@ -20,6 +20,11 @@ const authSlice = createSlice({
             state.msg = "Item Added to Cart Successfully !!";
             state.snackbarId += 1;  // Increment to force update
         },
+        addVehicle(state) {
+            state.openSnackbar = true;
+            state.msg = "New Vehicle Added Successfully !!";
+            state.snackbarId += 1;  // Increment to force update
+        },
         paymentSuccessful(state){
             state.openSnackbar = true;
             state.msg = "Order paid Successfully !!";

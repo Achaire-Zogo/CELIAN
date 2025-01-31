@@ -1,143 +1,170 @@
-/* eslint-disable default-case */
-import React from 'react'
-import ImageList from '@mui/material/ImageList';
-import ImageListItem from '@mui/material/ImageListItem';
-
-import {Card,Button, ButtonGroup} from '@mui/material';
-import CardActions from '@mui/material/CardActions';
-import CardContent from '@mui/material/CardContent';
-import CardMedia from '@mui/material/CardMedia';
-import IconButton from '@mui/material/IconButton';
-import Typography from '@mui/material/Typography';
+import React from 'react';
+import {
+  Card,
+  CardActions,
+  CardContent,
+  Typography,
+  IconButton,
+  Chip,
+  Stack,
+  Box,
+} from '@mui/material';
+import { useSelector, useDispatch } from 'react-redux';
 import AddShoppingCartIcon from '@mui/icons-material/AddShoppingCart';
 import RemoveShoppingCartIcon from '@mui/icons-material/RemoveShoppingCart';
-import { useSelector, useDispatch } from 'react-redux';
-import { addCart,removeCart } from '../../api-endpoints/endpoints';
-import {authActions} from '../../store'
+import { addCart, removeCart } from '../../api-endpoints/endpoints';
+import { authActions } from '../../store';
+import Slider from 'react-slick';
+import 'slick-carousel/slick/slick.css';
+import 'slick-carousel/slick/slick-theme.css';
 
+function Fleet({ isCart = false, props }) {
+  const { id, flotteType, price, vehicules } = props;
 
-function Fleet({
-    isCart=false,
-    id,
-    flotteType= "ELECTRIC",
-    vehicules,
-}) {
+  const isLoggedIn = useSelector((state) => state.isLoggedIn);
+  const dispatch = useDispatch();
 
-    //console.log(vehicules);
-    
-
-        const  isLoggedIn = useSelector(state=>state.isLoggedIn);
-        const dispatch = useDispatch();
-
-         const onDataReceived = (data,add=true)=>{
-                if(add){
-                    //console.log("add item");
-                    dispatch(authActions.addItem());
-                }
-                else{
-                    dispatch(authActions.removeItem());
-                }
-            }
-    
-       const addToCart = (e) =>  {
-   
-           e.preventDefault();
-   
-           if(isLoggedIn){
-               addCart(id).then((data)=>onDataReceived(data,true)).catch((err)=>console.log(err))
-           }
-           else{
-               console.log("Not LoggedIn please login or create an account !!");
-           }
-        
-     
-       }
-        
-       
-     
-       const removeFromCart = (e) =>  {
-         e.preventDefault();
-       
-         if(isLoggedIn){
-           removeCart(id).then((data)=>onDataReceived(data,false)).catch((err)=>console.log(err))
-       }
-       else{
-           console.log("Not LoggedIn please login or create an account !!");
-       }
-    
-     
-       }
-
-      return (
-        <Card sx={{ maxWidth: 345 }}>
-         
-         <ImageList  cols={2} sx={{ maxWidth: 3000, height: 235,transform: 'translateZ(0)' }} rowHeight={200} gap={1}>
-      {vehicules.map((item,index) => {
-        let isLast = (index+1) % 3 === 0 && vehicules.length % 2 === 1
-        let cols =  isLast ? 2 : 1;
-        let rows = 1;
-      return isLast ?  <ImageListItem key={item.uri} cols={cols} rows={rows} >
-          <img
-            srcSet={`${item.uri}?w=174&h=200&fit=crop&auto=format&dpr=2 2x`}
-            src={`${item.uri}?w=174&h=200&fit=crop&auto=format`}
-            alt={item.marque}
-            loading="lazy"
-          />
-        </ImageListItem> : <ImageListItem key={item.uri}  >
-          <img
-            srcSet={`${item.uri}?w=174&h=200&fit=crop&auto=format&dpr=2 2x`}
-            src={`${item.uri}?w=174&h=200&fit=crop&auto=format`}
-            alt={item.marque}
-            loading="lazy"
-          />
-        </ImageListItem>
-})}
-    </ImageList>
-    <CardContent>
-          <Typography gutterBottom variant="h5" component="div">
-           Fleet
-          </Typography>
-          <Typography variant="body2" sx={{ color: 'text.secondary' }}>
-            Number of Cars : {vehicules.length}, Price : {vehicules.reduce((acc, item) => acc + item.price, 0)} XAF
-          </Typography>
-         {vehicules.options && <> <Typography gutterBottom variant="h6" component="div">
-           Options
-          </Typography>
-          <ButtonGroup variant="outlined" aria-label="Basic button group">
-            {vehicules.options.map((_option,index)=>{
-                return <Button key={index}>{_option}</Button>
-            })}
-         </ButtonGroup></>}
-        </CardContent>
-          
-          <CardActions sx={{float: 'right'}}>
-            { !isCart &&
-          <IconButton
-                 size="small"
-                aria-label="add to cart"
-                color="inherit"
-                onClick={(e)=>addToCart(e)}
-              >
-               
-                  <AddShoppingCartIcon />
-                
-              </IconButton>
+  const onDataReceived = (data, add = true) => {
+    console.log(data);
+    if (add) {
+      dispatch(authActions.addItem());
+    } else {
+      dispatch(authActions.removeItem());
     }
-              {isCart &&
-              <IconButton
-                size="small"
-                aria-label="remove to cart"
-                color="error"
-                onClick={(e)=>removeFromCart(e)}
+  };
+
+  const addToCart = (e) => {
+    e.preventDefault();
+    if (isLoggedIn) {
+      addCart(id)
+        .then((data) => onDataReceived(data, true))
+        .catch((err) => console.log(err));
+    } else {
+      console.log('Not LoggedIn. Please login or create an account!');
+    }
+  };
+
+  const removeFromCart = (e) => {
+    e.preventDefault();
+    if (isLoggedIn) {
+      removeCart(id)
+        .then((data) => onDataReceived(data, false))
+        .catch((err) => console.log(err));
+    } else {
+      console.log('Not LoggedIn. Please login or create an account!');
+    }
+  };
+
+  // Slider settings
+  const sliderSettings = {
+    dots: true, // Show dots for navigation
+    infinite: true, // Infinite loop
+    speed: 500, // Transition speed
+    slidesToShow: 1, // Number of slides to show at once
+    slidesToScroll: 1, // Number of slides to scroll
+    autoplay: true, // Auto-play the slider
+    autoplaySpeed: 3000, // Auto-play speed in milliseconds
+    arrows: true, // Show navigation arrows
+  };
+
+  return (
+    <Card
+      sx={{
+        width: 345,
+        height: 'auto',
+        display: 'flex',
+        flexDirection: 'column',
+        borderRadius: 2,
+        boxShadow: 3,
+        transition: 'transform 0.2s',
+        '&:hover': {
+          transform: 'scale(1.02)',
+        },
+      }}
+    >
+      {/* Slider for Fleet Images */}
+      <Box sx={{ width: '100%', height: 250, overflow: 'hidden', borderRadius: '8px 8px 0 0' }}>
+        <Slider {...sliderSettings}>
+          {vehicules.map((item, index) => (
+            <Box key={index} sx={{ height: 250, position: 'relative' }}>
+              <img
+                src={item.uri}
+                alt={item.marque}
+                style={{
+                  width: '100%',
+                  height: '100%',
+                  objectFit: 'cover',
+                  borderRadius: '8px 8px 0 0',
+                }}
+              />
+              <Typography
+                variant="subtitle2"
+                sx={{
+                  position: 'absolute',
+                  bottom: 8,
+                  left: 8,
+                  backgroundColor: 'rgba(0, 0, 0, 0.5)',
+                  color: 'white',
+                  padding: '4px 8px',
+                  borderRadius: 2,
+                }}
               >
-               
-                  <RemoveShoppingCartIcon />
-                
-              </IconButton>}
-          </CardActions>
-         
-         
-        </Card>);
+                {item.marque} {item.model}
+              </Typography>
+            </Box>
+          ))}
+        </Slider>
+      </Box>
+
+      <CardContent sx={{ flexGrow: 1 }}>
+        <Typography gutterBottom variant="h5" component="div" sx={{ fontWeight: 'bold' }}>
+          Fleet - {flotteType}
+        </Typography>
+        <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+          <strong>Number of Vehicles:</strong> {vehicules.length}
+          <br />
+          <strong>Price:</strong> {price} XAF
+        </Typography>
+        
+      </CardContent>
+      <CardActions
+        sx={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          p: 2,
+          backgroundColor: '#f5f5f5',
+        }}
+      >
+        {!isCart ? (
+          <IconButton
+            size="small"
+            aria-label="add to cart"
+            color="primary"
+            onClick={addToCart}
+            sx={{ backgroundColor: 'primary.main', color: 'white', '&:hover': { backgroundColor: 'primary.dark' } }}
+          >
+            <AddShoppingCartIcon />
+          </IconButton>
+        ) : (
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+            <Typography variant="body2" color="text.secondary">
+              Quantity: 1
+            </Typography>
+            <IconButton
+              size="small"
+              aria-label="remove from cart"
+              color="error"
+              onClick={removeFromCart}
+              sx={{ backgroundColor: 'error.main', color: 'white', '&:hover': { backgroundColor: 'error.dark' } }}
+            >
+              <RemoveShoppingCartIcon />
+            </IconButton>
+          </Box>
+        )}
+      </CardActions>
+    </Card>
+  );
 }
 
-export default Fleet
+export default Fleet;

@@ -18,6 +18,7 @@ import Payment from './payment/Payment';
 import User from './clients/User';
 import Login from './auth/Login';
 import AddVehicule from './catalogue/vehicles/AddVehicule';
+import Profile from './clients/Profile';
 
 function App() {
   const dispatch = useDispatch();
@@ -72,6 +73,7 @@ function App() {
            <Route path="/cart" element={<Cart />} />
            <Route path="/payments" element={<Payment />} />
            <Route path={"/vehicles"} element={<AddVehicule/>}/>
+           <Route path="/profile" element={<Profile/>}/>
 
            
          </Routes>

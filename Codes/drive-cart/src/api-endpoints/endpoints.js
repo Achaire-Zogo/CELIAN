@@ -10,9 +10,10 @@ export const getAllUsers = async () => {
     const data = res.data;
     return data;    
 }
-export const getUser = async (id) => {
+export const getUser = async () => {
+    let userId = parseInt(localStorage.getItem('userId'));
 
-    const res = await axios.get(`/api/v1/users/${id}`).catch((err)=> console.log(err));
+    const res = await axios.get(`/api/v1/users/${userId}`).catch((err)=> console.log(err));
   
     if(res.status !== 200){
      return console.log("Unable to fetch user");
@@ -117,8 +118,9 @@ export const addFuelScooter = async(data)=>{
 
 export const addVehicleFleet = async(data)=>{
     const res = await axios.post(`/api/vehicules/flotte`,{
-        flotteType: "ELECTRIC",
-        vehicules: data.vehicules
+        type: data.type,
+        flotteType: data.flotteType,
+        vehicules: data.vehicles
     }).catch((err)=> console.log(err));
 
     if(res.status !== 200 && res.status !== 201 ){
@@ -206,7 +208,7 @@ export const register = async (data) => {
 
 
 export const getAllOrders = async () => {
-    const res = await axios.get(`/api/v1/orders/`).catch((err)=> console.log(err));
+    const res = await axios.get(`/api/v1/orders`).catch((err)=> console.log(err));
   
     if(res.status !== 200){
      return console.log("Unable to fetch orders");
