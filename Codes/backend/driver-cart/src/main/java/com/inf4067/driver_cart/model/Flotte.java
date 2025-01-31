@@ -44,5 +44,10 @@ public class Flotte extends Vehicule {
         vehicules.add(vehicule);
         return this;
     }
+
+        @Override
+        public double getPrice(){
+            return vehicules.stream().mapToDouble(Vehicule::getPrice).sum();
+        }
    
 }

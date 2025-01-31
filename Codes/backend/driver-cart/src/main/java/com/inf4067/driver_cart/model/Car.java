@@ -21,7 +21,7 @@ public class Car extends Vehicule {
     private Long id;
 
     public Car(){
-        this.setType(VehicleType.CAR);
+       
     }
 
     

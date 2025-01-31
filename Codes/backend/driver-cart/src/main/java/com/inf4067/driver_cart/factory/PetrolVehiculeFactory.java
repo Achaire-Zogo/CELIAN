@@ -13,10 +13,9 @@ public class PetrolVehiculeFactory implements VehiculeFactory {
         PetrolCar petrolCar = new PetrolCar();
         petrolCar.setModel(model);
         petrolCar.setPrice(price);
-        petrolCar.setType(VehicleType.CAR);
+        petrolCar.setType(VehicleType.FUEL_CAR);
         petrolCar.setEngineSize(2000); // cc
         petrolCar.setFuelType(FuelType.GASOLINE);
-        petrolCar.setType(VehicleType.FUEL_CAR);
 
         return petrolCar;
     }
@@ -24,7 +23,8 @@ public class PetrolVehiculeFactory implements VehiculeFactory {
     @Override
     public Scooter getScooter(String model, double price) {
         PetrolScooter scooter = new PetrolScooter();
-        
+        scooter.setModel(model);
+        scooter.setPrice(price);
         scooter.setEngineSize(125); // cc
         scooter.setFuelType(FuelType.GASOLINE);
         scooter.setType(VehicleType.FUEL_SCOOTER);

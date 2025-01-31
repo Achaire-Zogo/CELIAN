@@ -15,7 +15,6 @@ import lombok.Setter;
 @Entity
 @Table(name ="petrol_scooters")
 @AllArgsConstructor
-@NoArgsConstructor
 @Getter
 @Setter
 public class PetrolScooter extends Scooter {
@@ -30,7 +29,9 @@ public class PetrolScooter extends Scooter {
     public FuelType fuelType;
 
    
-   
+    public PetrolScooter(){
+        this.setType(VehicleType.FUEL_SCOOTER);
+    }
 
    
     

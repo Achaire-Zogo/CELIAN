@@ -13,7 +13,6 @@ import lombok.Setter;
 @Entity
 @Table(name ="electric_scooters")
 @AllArgsConstructor
-@NoArgsConstructor
 @Getter
 @Setter
 public class ElectricScooter extends Scooter {
@@ -26,8 +25,11 @@ public class ElectricScooter extends Scooter {
 
     public int batteryCapacity;
 
+    public ElectricScooter(){
+        this.setType(VehicleType.ELECTRIC_SCOOTER);
+    }
    
-
+   
    
     
 }
