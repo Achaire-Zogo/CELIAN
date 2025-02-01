@@ -31,6 +31,17 @@ public class Order {
 
 
     
+    // Helper method to add an OrderItem
+public void addItem(OrderItem item) {
+    items.add(item);
+    item.setOrder(this);
+}
+
+// Helper method to remove an OrderItem
+public void removeItem(OrderItem item) {
+    items.remove(item);
+    item.setOrder(null);
+}
     // Getters and setters
     public Long getId() {
         return id;
