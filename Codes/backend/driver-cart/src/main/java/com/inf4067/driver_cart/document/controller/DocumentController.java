@@ -1,8 +1,19 @@
 package com.inf4067.driver_cart.document.controller;
 
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import org.springframework.http.HttpHeaders;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
+import org.springframework.core.io.Resource;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.UrlResource;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -16,6 +27,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestParam;
+
 
 
 
@@ -25,6 +38,8 @@ public class DocumentController {
     
     @Autowired
     private DocumentService documentService;
+
+    private final Path storagePath = Paths.get("storage");
 
     @PostMapping("/pdf/generate")
     public DocumentBundle createPdfDocument(@RequestBody BundleRequest request) {
@@ -40,6 +55,38 @@ public class DocumentController {
     public List<VehicleDocument> getDocuments() {
         return documentService.getAllDocuments();
     }
+    
+    @GetMapping("/download/{filename}")
+    public ResponseEntity<Resource> downloadFile(@PathVariable String filename) throws IOException {
+        Path filePath = storagePath.resolve(filename).normalize();
+
+        Resource resource = new UrlResource(filePath.toUri());
+
+        if(!resource.exists() || !resource.isReadable())
+        {
+            throw new FileNotFoundException("File not found");
+        }
+
+        return ResponseEntity.ok()
+            .contentType(MediaType.APPLICATION_OCTET_STREAM)
+            .header(HttpHeaders.CONTENT_DISPOSITION, "attachement=\"" + resource.getFilename() + "\"")
+            .body(resource);
+    }
+
+    @GetMapping("/get-by-order/{orderId}")
+    public List<String> getDocumentsByOrder(@PathVariable long orderId) {
+        List<VehicleDocument> documents = documentService.getDocumentsByOrder(orderId);
+
+        List<String> paths = new ArrayList<>();
+
+        for (VehicleDocument document : documents) {
+            String filename = document.getFilepath().split("storage/")[1];
+
+            paths.add(filename);
+        }
+        return paths;
+    }
+    
     
     @GetMapping("/{id}")
     public VehicleDocument getDocument(@PathVariable long id) {

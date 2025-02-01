@@ -3,6 +3,7 @@ package com.inf4067.driver_cart.document.model;
 import com.inf4067.driver_cart.document.builder.IDocumentBuilder;
 import com.inf4067.driver_cart.document.enumeration.DocumentFormat;
 import com.inf4067.driver_cart.document.enumeration.DocumentType;
+import com.inf4067.driver_cart.order.model.Order;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -12,6 +13,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Inheritance;
 import jakarta.persistence.InheritanceType;
+import jakarta.persistence.ManyToOne;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -35,6 +37,8 @@ public abstract class VehicleDocument {
     private String title;
     private String content;*/
     private String filepath;
+
+    private long orderId;
 
     
     @Enumerated(EnumType.STRING)

@@ -53,15 +53,14 @@ public class VehiculeService {
     public Scooter savePetrolScooter(PetrolScooter vehicule) {
         // TODO Auto-generated method stub
        
-        Scooter scooter = petrolFactory.getScooter();
+        Scooter scooter = petrolFactory.getScooter(vehicule.model,vehicule.price);
         scooter.setMarque(vehicule.marque);
-        scooter.setModel(vehicule.model);
         scooter.setOptions(vehicule.options);
-        scooter.setPrice(vehicule.price);
-        scooter.setType(VehicleType.FUEL_SCOOTER);
         scooter.setUri(vehicule.uri);
+        
         ((PetrolScooter) scooter).setFuelType(vehicule.fuelType);
         ((PetrolScooter) scooter).setEngineSize(vehicule.engineSize);
+        ((PetrolScooter) scooter).setType(VehicleType.FUEL_SCOOTER);
 
         return scooterRepository.save(scooter);
 
@@ -69,14 +68,12 @@ public class VehiculeService {
     }
 
     public Scooter saveElectricScooter(ElectricScooter vehicule) {
-        Scooter scooter = electricFactory.getScooter();
+        Scooter scooter = electricFactory.getScooter(vehicule.model,vehicule.price);
         scooter.setMarque(vehicule.marque);
-        scooter.setModel(vehicule.model);
         scooter.setOptions(vehicule.options);
-        scooter.setPrice(vehicule.price);
-        scooter.setType(VehicleType.ELECTRIC_SCOOTER);
         scooter.setUri(vehicule.uri);
         ((ElectricScooter) scooter).setBatteryCapacity(vehicule.batteryCapacity);
+        ((ElectricScooter) scooter).setType(VehicleType.ELECTRIC_SCOOTER);
 
         return scooterRepository.save(scooter);
     }
@@ -88,15 +85,17 @@ public class VehiculeService {
         car.setMarque(vehicule.marque);
         car.setOptions(vehicule.options);
         car.setUri(vehicule.uri);
+        car.setType(VehicleType.FUEL_CAR);
         ((PetrolCar) car).setEngineSize(vehicule.engineSize);
         ((PetrolCar) car).setFuelType(vehicule.fuelType);
+        
 
         return carRepository.save(vehicule);
 
     }
 
     public Flotte saveFlotte(Flotte flotte) {
-        flotte.setType(VehicleType.FLEET);
+        //flotte.setType(VehicleType.FLEET);
         return flotteRepository.save(flotte);
     }
 

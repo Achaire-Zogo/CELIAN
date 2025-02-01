@@ -1,5 +1,7 @@
 package com.inf4067.driver_cart.order.service;
 
+import com.inf4067.driver_cart.document.enumeration.DocumentFormat;
+import com.inf4067.driver_cart.observer.Subject;
 import com.inf4067.driver_cart.order.model.CartItem;
 import com.inf4067.driver_cart.order.model.CartStatus;
 import com.inf4067.driver_cart.country.model.Country;
@@ -67,7 +69,11 @@ public class OrderService extends Subject {
         // Save the order to get the generated orderId
         Order savedOrder = orderRepository.save(order);
         Long orderId = savedOrder.getId();
-    
+        
+        // Communiquer avec les observateurs
+        this.notifyObservers(savedOrder, activeCartItems, DocumentFormat.PDF);
+        this.notifyObservers(savedOrder, activeCartItems, DocumentFormat.HTML);
+        
         // Update the status and orderId of each cart item
         for (CartItem cartItem : activeCartItems) {
             cartItem.setStatus(CartStatus.ORDERED);
@@ -76,10 +82,7 @@ public class OrderService extends Subject {
     
         // Save the updated cart items
         cartItemRepository.saveAll(activeCartItems);
-    
-        // Communicate with observers
-        //this.notifyObservers(order, DocumentFormat.HTML);
-    
+        
         return savedOrder;
     }
 
