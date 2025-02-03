@@ -3,6 +3,8 @@ package com.inf4067.driver_cart.document.service;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.xml.parsers.DocumentBuilder;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.EventListener;
@@ -20,6 +22,8 @@ import com.inf4067.driver_cart.document.model.VehicleDocument;
 import com.inf4067.driver_cart.document.repository.VehicleDocumentRepository;
 import com.inf4067.driver_cart.document.request.BundleRequest;
 import com.inf4067.driver_cart.document.singleton.DocumentBundle;
+import com.inf4067.driver_cart.model.Flotte;
+import com.inf4067.driver_cart.model.VehicleType;
 import com.inf4067.driver_cart.model.Vehicule;
 import com.inf4067.driver_cart.observer.Observer;
 import com.inf4067.driver_cart.observer.OrderCreatedEvent;
@@ -43,13 +47,9 @@ public class DocumentService implements ApplicationListener<OrderCreatedEvent>{
     @Autowired
     private UserService userService;
     
-    private DocumentBundle buildBundle(BundleRequest request, IDocumentBuilder documentBuilder)
+    // generated registrations requests
+    private RegistrationRequest generateRegistrationRequest(BundleRequest request, Vehicule vehicule, User user, IDocumentBuilder documentBuilder)
     {
-        Vehicule vehicule = vehiculeService.getVehiculeById(request.getVehicleId());
-        User user = userService.getUser(request.getBuyerId());
-
-        // Set Document Order
-        
         // Set datas for RegistrationRequest
         RegistrationRequest registrationRequest = new RegistrationRequest();
         registrationRequest.setVehicle(vehicule);
@@ -57,6 +57,18 @@ public class DocumentService implements ApplicationListener<OrderCreatedEvent>{
 
         registrationRequest.setOrderId(request.getOrderId());
 
+        // Save in database
+        RegistrationRequest savedRR =  documentRepository.save(registrationRequest);
+
+        // Generate
+        savedRR.generate(documentBuilder);
+
+        return savedRR;
+    }
+    
+    // Generated transferts certificates
+    private TransfertCertificate generateTransfertCertificate(BundleRequest request, Vehicule vehicule, User user, IDocumentBuilder documentBuilder)
+    {
         // Set Datas for TransfertCertificate
         TransfertCertificate transfertCertificate = new TransfertCertificate();
         transfertCertificate.setVehicle(vehicule);
@@ -65,27 +77,60 @@ public class DocumentService implements ApplicationListener<OrderCreatedEvent>{
 
         transfertCertificate.setOrderId(request.getOrderId());
 
+        // Save in database
+        TransfertCertificate savedTC = documentRepository.save(transfertCertificate);
+
+        // Generate
+        savedTC.generate(documentBuilder);
+
+        return savedTC;
+    }
+
+    // Generated purchase Orders
+    private PurchaseOrder generatePurchaseOrder(BundleRequest request, List<Vehicule> vehicules, User user, IDocumentBuilder documentBuilder)
+    {
+
         // Set Datas for purchase Order
         PurchaseOrder purchaseOrder = new PurchaseOrder();
-        purchaseOrder.setVehicle(vehicule);
+        //purchaseOrder.setVehicle(vehicule);
+        purchaseOrder.setVehicles(vehicules);
         purchaseOrder.setUser(user);
 
         purchaseOrder.setOrderId(request.getOrderId());
-
-
-        RegistrationRequest savedRR =  documentRepository.save(registrationRequest);
-        TransfertCertificate savedTC = documentRepository.save(transfertCertificate);
+        purchaseOrder.setOrderTotal(request.getOrderTotal());
+        
+        
+        // Save in database
         PurchaseOrder savedPO = documentRepository.save(purchaseOrder);
 
-        // Generate documents
-        savedRR.generate(documentBuilder);
-        savedTC.generate(documentBuilder);
+        // Generate
         savedPO.generate(documentBuilder);
 
+        return savedPO;
+    }
+
+    private DocumentBundle buildBundle(BundleRequest request, IDocumentBuilder documentBuilder)
+    {
+        Vehicule vehicule = vehiculeService.getVehiculeById(request.getVehicleId());
+        User user = userService.getUser(request.getBuyerId());
+
+        // Get saved Registration Request
+        RegistrationRequest generatedRR = this.generateRegistrationRequest(request, vehicule, user, documentBuilder);
+        
+        // Get saved Transfert Certificate
+        TransfertCertificate generatedTC = this.generateTransfertCertificate(request, vehicule, user, documentBuilder);
+        
+        // Vehicles list for purchase order
+        List<Vehicule> vehiculesList = new ArrayList<>();
+        vehiculesList.add(vehicule);
+
+        // Get saved purchase Order
+        PurchaseOrder generatedPO = this.generatePurchaseOrder(request, vehiculesList, user, documentBuilder);
+        
         DocumentBundle documentBundle = DocumentBundle.getInstance();
-        documentBundle.setRegistrationRequest(savedRR);
-        documentBundle.setTransfertCertificate(savedTC);
-        documentBundle.setPurchaseOrder(savedPO);
+        documentBundle.setRegistrationRequest(generatedRR);
+        documentBundle.setTransfertCertificate(generatedTC);
+        documentBundle.setPurchaseOrder(generatedPO);
 
         return documentBundle;
     }
@@ -103,6 +148,7 @@ public class DocumentService implements ApplicationListener<OrderCreatedEvent>{
 
         return this.buildBundle(request, documentBuilder);
     }
+
 
     public VehicleDocument getDocumentById(Long id) {
         return documentRepository.findById(id).orElse(null);
@@ -140,28 +186,6 @@ public class DocumentService implements ApplicationListener<OrderCreatedEvent>{
         return documentRepository.findByDocumentType(DocumentType.PURCHASE_ORDER);
     }
 
-    // Methodes a implementer
-    /*@EventListener
-    public void handleCustomEvent(OrderCreatedEvent event) {
-        Order order = event.getOrder();
-        DocumentFormat format = event.getFormat();
-
-        BundleRequest request = new BundleRequest();
-        request.setBuyerId(order.getUserId());
-        request.setTransfertDate(order.getCreatedAt().toString());
-        
-        for (OrderItem orderItem : order.getItems()) {
-            
-            for(int i = 0; i < orderItem.getQuantity(); i++)
-            {
-                request.setVehicleId(orderItem.getVehicleId());
-
-                if(format == DocumentFormat.PDF) createPdfDocument(request);
-                else createHtmlDocument(request);
-            }
-        }
-    }*/
-
     @Override
     public void onApplicationEvent(OrderCreatedEvent event) {
         Order order = event.getOrder();
@@ -174,15 +198,35 @@ public class DocumentService implements ApplicationListener<OrderCreatedEvent>{
         request.setOrderId(order.getId());
         request.setBuyerId(order.getUserId());
         request.setTransfertDate(order.getCreatedAt().toLocalDate().toString());
+        request.setOrderTotal(order.getTotal());
         
         for (CartItem cartItem : cartItems) {
             
-            for(int i = 0; i < cartItem.getQuantity(); i++)
+            if(cartItem.getVehicle().getType() != VehicleType.FLEET)
             {
-                request.setVehicleId(cartItem.getVehicleId());
+                for(int i = 0; i < cartItem.getQuantity(); i++)
+                {
+                    request.setVehicleId(cartItem.getVehicleId());
+    
+                    if(format == DocumentFormat.PDF) createPdfDocument(request);
+                    else createHtmlDocument(request);
+                }
+            }
+            else {
+                Flotte fleet = (Flotte) cartItem.getVehicle();
+                List<Vehicule> fleetVehicles = fleet.getVehicules();
 
-                if(format == DocumentFormat.PDF) createPdfDocument(request);
-                else createHtmlDocument(request);
+                User user = userService.getUser(order.getUserId());
+
+                IDocumentBuilder documentBuilder = format == DocumentFormat.PDF ? new PdfDocumentBuilder() : new HtmlDocumentBuilder();
+
+                for (Vehicule fleetVehicle : fleetVehicles) {
+                    
+                    this.generateRegistrationRequest(request, fleetVehicle, user, documentBuilder);
+                    this.generateTransfertCertificate(request, fleetVehicle, user, documentBuilder);
+                }
+
+                this.generatePurchaseOrder(request, fleetVehicles, user, documentBuilder);
             }
         }
     }
