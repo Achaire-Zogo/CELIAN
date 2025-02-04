@@ -36,4 +36,9 @@ public class CartController {
     public List<CartItem> getCart(@RequestParam Long userId) {
         return cartService.getItemCart(userId);
     }
+
+    @PostMapping("/remove-last")
+    public void removeLastItemFromCart(@RequestParam Long userId) {
+        cartService.removeLastItemFromCart(userId);
+    }
 }

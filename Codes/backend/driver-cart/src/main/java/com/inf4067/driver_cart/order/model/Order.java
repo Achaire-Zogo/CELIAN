@@ -1,8 +1,13 @@
 package com.inf4067.driver_cart.order.model;
 
 import com.inf4067.driver_cart.order.state.OrderState;
+import com.inf4067.driver_cart.order.model.OrderType;
+import com.inf4067.driver_cart.user.model.User;
+import com.inf4067.driver_cart.country.model.Country;
+import com.inf4067.driver_cart.order.model.CartItem;
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -12,14 +17,25 @@ public class Order {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "user_id", insertable = false, updatable = false)
+    private User user;
+
+    @Column(name = "user_id")
     private Long userId; // ID de l'utilisateur
 
-    private Long countryId; // ID de du pays    
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "country_id", insertable = false, updatable = false)
+    private Country country;
+
+    @Column(name = "country_id")
+    private Long countryId; // ID du pays    
 
     private double total;
 
-    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<OrderItem> items;
+    @OneToMany(fetch = FetchType.EAGER)
+    @JoinColumn(name = "order_id", referencedColumnName = "id")
+    private List<CartItem> items;
 
     @Enumerated(EnumType.STRING)
     private OrderState state; // État de la commande
@@ -29,19 +45,21 @@ public class Order {
 
     private LocalDateTime createdAt;
 
+    public Order() {
+        this.items = new ArrayList<>();
+    }
 
-    
-    // Helper method to add an OrderItem
-public void addItem(OrderItem item) {
-    items.add(item);
-    item.setOrder(this);
-}
+    // Helper method to add an CartItem
+    public void addItem(CartItem item) {
+        items.add(item);
+        item.setOrderId(this.id);
+    }
 
-// Helper method to remove an OrderItem
-public void removeItem(OrderItem item) {
-    items.remove(item);
-    item.setOrder(null);
-}
+    // Helper method to remove an CartItem
+    public void removeItem(CartItem item) {
+        items.remove(item);
+        item.setOrderId(null);
+    }
     // Getters and setters
     public Long getId() {
         return id;
@@ -49,6 +67,14 @@ public void removeItem(OrderItem item) {
 
     public void setId(Long id) {
         this.id = id;
+    }
+
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
     }
 
     public Long getUserId() {
@@ -59,11 +85,27 @@ public void removeItem(OrderItem item) {
         this.userId = userId;
     }
 
-    public List<OrderItem> getItems() {
+    public Country getCountry() {
+        return country;
+    }
+
+    public void setCountry(Country country) {
+        this.country = country;
+    }
+
+    public Long getCountryId() {
+        return countryId;
+    }
+
+    public void setCountryId(Long countryId) {
+        this.countryId = countryId;
+    }
+
+    public List<CartItem> getItems() {
         return items;
     }
 
-    public void setItems(List<OrderItem> items) {
+    public void setItems(List<CartItem> items) {
         this.items = items;
     }
 
@@ -89,14 +131,6 @@ public void removeItem(OrderItem item) {
 
     public void setCreatedAt(LocalDateTime createdAt) {
         this.createdAt = createdAt;
-    }
-
-    public void setCountryId(Long countryId) {
-        this.countryId = countryId;
-    }
-
-    public Long getCountryId() {
-        return countryId;
     }
 
     public void setTotal(double total) {

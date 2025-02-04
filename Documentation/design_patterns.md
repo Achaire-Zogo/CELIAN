@@ -1,256 +1,77 @@
 # Diagrammes des Design Patterns
 
-## 1. Abstract Factory Pattern
+## 1. Factory Method Pattern
 
-![Abstract Factory Pattern](images/abstract_factory.png)
-
-```mermaid
-classDiagram
-    class VehicleFactory {
-        <<interface>>
-        +createVehicle()
-        +createEngine()
-    }
-    class ElectricVehicleFactory {
-        +createVehicle()
-        +createEngine()
-    }
-    class PetrolVehicleFactory {
-        +createVehicle()
-        +createEngine()
-    }
-    class Vehicle {
-        <<interface>>
-    }
-    class Engine {
-        <<interface>>
-    }
-    class ElectricCar
-    class PetrolCar
-    class ElectricEngine
-    class PetrolEngine
-
-    VehicleFactory <|.. ElectricVehicleFactory
-    VehicleFactory <|.. PetrolVehicleFactory
-    Vehicle <|.. ElectricCar
-    Vehicle <|.. PetrolCar
-    Engine <|.. ElectricEngine
-    Engine <|.. PetrolEngine
-    ElectricVehicleFactory ..> ElectricCar
-    ElectricVehicleFactory ..> ElectricEngine
-    PetrolVehicleFactory ..> PetrolCar
-    PetrolVehicleFactory ..> PetrolEngine
-```
-
-## 2. Builder Pattern (Documents)
-
-![Builder Pattern](images/builder.png)
+![Factory Method Pattern](images/factory_methode.png)
 
 ```mermaid
 classDiagram
-    class DocumentBuilder {
-        -document: Document
-        +addHeader(header: String)
-        +addContent(content: String)
-        +addFooter(footer: String)
-        +build() Document
-    }
-    class Document {
-        -header: String
-        -content: String
-        -footer: String
-        +setHeader(header: String)
-        +setContent(content: String)
-        +setFooter(footer: String)
-    }
-    class DocumentDirector {
-        -builder: DocumentBuilder
-        +constructPDFDocument()
-        +constructHTMLDocument()
-    }
-
-    DocumentBuilder --> Document
-    DocumentDirector --> DocumentBuilder
-```
-
-## 3. Factory Method Pattern (Commandes)
-
-![Factory Method Pattern](images/factory_method.png)
-
-```mermaid
-classDiagram
-    class OrderCreator {
+    class OrderFactory {
         <<interface>>
-        +createOrder() Order
+        +createOrder(userId: Long, countryId: Long, type: OrderType, items: List) Order
     }
-    class CashOrderCreator {
-        +createOrder() Order
+    class CashOrderFactory {
+        +createOrder(userId: Long, countryId: Long, type: OrderType, items: List) Order
     }
-    class CreditOrderCreator {
-        +createOrder() Order
+    class CreditOrderFactory {
+        +createOrder(userId: Long, countryId: Long, type: OrderType, items: List) Order
     }
     class Order {
-        <<interface>>
-        +process()
-    }
-    class CashOrder {
-        +process()
-    }
-    class CreditOrder {
-        +process()
+        -userId: Long
+        -countryId: Long
+        -total: double
+        -items: List~CartItem~
+        -state: OrderState
+        -type: OrderType
+        -createdAt: LocalDateTime
+        +setTotal(double)
+        +addItem(CartItem)
     }
 
-    OrderCreator <|.. CashOrderCreator
-    OrderCreator <|.. CreditOrderCreator
-    Order <|.. CashOrder
-    Order <|.. CreditOrder
-    CashOrderCreator ..> CashOrder
-    CreditOrderCreator ..> CreditOrder
+    OrderFactory <|.. CashOrderFactory
+    OrderFactory <|.. CreditOrderFactory
+    CashOrderFactory ..> Order : creates
+    CreditOrderFactory ..> Order : creates
 ```
 
-## 4. Composite Pattern (Sociétés)
+## 2. Template Method Pattern
 
-![Composite Pattern](images/composite.png)
+![Template Method Pattern](images/template_methode.png)
 
 ```mermaid
 classDiagram
-    class Company {
-        <<interface>>
-        +addSubsidiary(Company)
-        +removeSubsidiary(Company)
-        +getSubsidiaries() List
-    }
-    class ParentCompany {
-        -subsidiaries: List
-        +addSubsidiary(Company)
-        +removeSubsidiary(Company)
-        +getSubsidiaries() List
-    }
-    class Subsidiary {
-        -name: String
-        +addSubsidiary(Company)
-        +removeSubsidiary(Company)
-        +getSubsidiaries() List
-    }
-
-    Company <|.. ParentCompany
-    Company <|.. Subsidiary
-    ParentCompany o--> Company
-```
-
-## 5. Observer Pattern (Catalogue)
-
-![Observer Pattern](images/observer.png)
-
-```mermaid
-classDiagram
-    class CatalogueSubject {
-        -observers: List
-        +attach(Observer)
-        +detach(Observer)
-        +notify()
-    }
-    class Observer {
-        <<interface>>
-        +update()
-    }
-    class PriceObserver {
-        +update()
-    }
-    class StockObserver {
-        +update()
-    }
-
-    CatalogueSubject --> Observer
-    Observer <|.. PriceObserver
-    Observer <|.. StockObserver
-```
-
-## 6. Decorator Pattern (Options Véhicule)
-
-![Decorator Pattern](images/decorator.png)
-
-```mermaid
-classDiagram
-    class Vehicle {
-        <<interface>>
-        +getDescription() String
-        +cost() Double
-    }
-    class BaseVehicle {
-        +getDescription() String
-        +cost() Double
-    }
-    class OptionDecorator {
+    class OrderAmountCalculator {
         <<abstract>>
+        +calculateOrderAmount(items: List) double
+        #calculateSubtotal(items: List) double
+        #calculateTaxes(subtotal: double)* double
+        #calculateFees(subtotal: double)* double
+        #finalizeAmount(total: double)* double
+    }
+    class CashOrderAmountCalculator {
+        -TAX_RATE: double
+        -CASH_DISCOUNT: double
+        #calculateTaxes(subtotal: double) double
+        #calculateFees(subtotal: double) double
+        #finalizeAmount(total: double) double
+    }
+    class CreditOrderAmountCalculator {
+        -TAX_RATE: double
+        -CREDIT_FEE_RATE: double
+        #calculateTaxes(subtotal: double) double
+        #calculateFees(subtotal: double) double
+        #finalizeAmount(total: double) double
+    }
+    class CartItem {
+        -userId: Long
+        -vehicleId: Long
+        -quantity: int
+        -status: CartStatus
+        -orderId: Long
         -vehicle: Vehicle
-        +getDescription() String
-        +cost() Double
-    }
-    class LeatherSeatsOption {
-        +getDescription() String
-        +cost() Double
-    }
-    class GPSOption {
-        +getDescription() String
-        +cost() Double
     }
 
-    Vehicle <|.. BaseVehicle
-    Vehicle <|.. OptionDecorator
-    OptionDecorator <|-- LeatherSeatsOption
-    OptionDecorator <|-- GPSOption
-    OptionDecorator o--> Vehicle
-```
-
-## 7. Iterator Pattern (Catalogue)
-
-![Iterator Pattern](images/iterator.png)
-
-```mermaid
-classDiagram
-    class Iterator {
-        <<interface>>
-        +hasNext() Boolean
-        +next() Vehicle
-    }
-    class CatalogueIterator {
-        -vehicles: List
-        -position: int
-        +hasNext() Boolean
-        +next() Vehicle
-    }
-    class Catalogue {
-        -vehicles: List
-        +createIterator() Iterator
-    }
-
-    Iterator <|.. CatalogueIterator
-    Catalogue --> CatalogueIterator
-```
-
-## 8. Template Method Pattern (Calcul Commande)
-
-![Template Method Pattern](images/template_method.png)
-
-```mermaid
-classDiagram
-    class OrderCalculator {
-        <<abstract>>
-        +calculateTotal() Double
-        #calculateBasePrice() Double
-        #calculateTaxes() Double
-        #calculateDiscount() Double
-    }
-    class CashOrderCalculator {
-        #calculateTaxes() Double
-        #calculateDiscount() Double
-    }
-    class CreditOrderCalculator {
-        #calculateTaxes() Double
-        #calculateDiscount() Double
-    }
-
-    OrderCalculator <|-- CashOrderCalculator
-    OrderCalculator <|-- CreditOrderCalculator
+    OrderAmountCalculator <|-- CashOrderAmountCalculator
+    OrderAmountCalculator <|-- CreditOrderAmountCalculator
+    OrderAmountCalculator ..> CartItem : uses
 ```

@@ -22,8 +22,7 @@ public class CartItem {
     @Enumerated(EnumType.STRING)
     private CartStatus status;
 
-    
-    @Column(nullable = true)
+    @Column(name = "order_id", nullable = true)
     private Long orderId; // ID de la commande (NULL si pas encore converti en commande)
 
 
