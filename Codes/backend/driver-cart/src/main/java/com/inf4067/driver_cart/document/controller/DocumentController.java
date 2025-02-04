@@ -41,15 +41,15 @@ public class DocumentController {
 
     private final Path storagePath = Paths.get("storage");
 
-    @PostMapping("/pdf/generate")
+    /*@PostMapping("/pdf/generate")
     public DocumentBundle createPdfDocument(@RequestBody BundleRequest request) {
         return documentService.createPdfDocument(request);
-    }
+    }*/
 
-    @PostMapping("/html/generate")
+    /*@PostMapping("/html/generate")
     public DocumentBundle createHtmlDocument(@RequestBody BundleRequest request) {
         return documentService.createHtmlDocument(request);
-    }
+    }*/
     
     @GetMapping
     public List<VehicleDocument> getDocuments() {

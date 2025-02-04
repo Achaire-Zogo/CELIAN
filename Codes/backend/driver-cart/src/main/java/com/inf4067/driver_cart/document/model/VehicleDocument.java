@@ -31,11 +31,6 @@ public abstract class VehicleDocument {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
-    /*@Column(unique = true)
-    private String name;
-    private String header;
-    private String title;
-    private String content;*/
     private String filepath;
 
     private long orderId;

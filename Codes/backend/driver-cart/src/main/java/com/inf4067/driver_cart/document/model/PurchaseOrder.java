@@ -1,7 +1,14 @@
 package com.inf4067.driver_cart.document.model;
 
+import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
+import java.util.List;
+import java.util.Locale;
+import java.util.Set;
 
 import com.inf4067.driver_cart.document.adapter.IDocumentFormat;
 import com.inf4067.driver_cart.document.builder.IDocumentBuilder;
@@ -10,6 +17,7 @@ import com.inf4067.driver_cart.model.Vehicule;
 import com.inf4067.driver_cart.user.model.User;
 
 import jakarta.persistence.Entity;
+import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -23,11 +31,13 @@ import lombok.NoArgsConstructor;
 @EqualsAndHashCode(callSuper = false)
 public class PurchaseOrder extends VehicleDocument {
 
-    @ManyToOne
-    private Vehicule vehicle;
+    @ManyToMany
+    private List<Vehicule> vehicles = new ArrayList<>();
 
     @ManyToOne
     private User user; // buyer
+
+    private double orderTotal;
 
     @Override
     public void generate(IDocumentBuilder documentBuilder) {
@@ -55,40 +65,80 @@ public class PurchaseOrder extends VehicleDocument {
         this.setDocumentType(DocumentType.PURCHASE_ORDER);
     }
 
+    private String formatPrice(double price) {
+        DecimalFormatSymbols symbols = new DecimalFormatSymbols(Locale.getDefault());
+        symbols.setGroupingSeparator(' ');
+
+        DecimalFormat decimalFormat = new DecimalFormat("#,###.0", symbols);
+        return decimalFormat.format(price);
+    }
+
+    private String formatOptions(Set<String> options) {
+        if (options == null || options.isEmpty()) {
+            return "        Aucune option";
+        }
+        return "        • " + String.join("\n        • ", options);
+    }
+
     @Override
     protected String getFormattedContent() {
-
         long timestamp = System.currentTimeMillis();
         SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
         String dateFormatted = sdf.format(new Date(timestamp));
-
+    
+        // Formatage du contenu des véhicules
+        StringBuilder vehicleContent = new StringBuilder();
+        for (Vehicule vehicle : this.getVehicles()) {
+            vehicleContent.append(String.format("""
+                    --------------------------------------------
+                    Véhicule : %s %s
+                    Type     : %s
+                    Prix     : %s FCFA
+                    Options  :
+                    %s
+                    """,
+                    vehicle.getMarque(),
+                    vehicle.getModel(),
+                    vehicle.getType(),
+                    formatPrice(vehicle.getPrice()),
+                    formatOptions(vehicle.getOptions()) // Formate les options
+            ));
+        }
+    
+        // Formatage du contenu global
         return String.format("""
-            COMMANDE N°000%s DU %s
+                ============================================
+                                COMMANDE N°000%s
+                                DATE : %s
+                ============================================
+    
+                ## CLIENT
+    
+                Nom   : %s
+                Email : %s
+    
+                ## VÉHICULES
+    
+                %s
+                ============================================
+                            TOTAL : %s FCFA
+                ============================================
+                """,
+                getId(),
+                dateFormatted,
+                getUser().getName(),
+                getUser().getEmail(),
+                vehicleContent.toString(),
+                formatPrice(getOrderTotal())
+        );
+    }
+    
 
-            # CLIENT
-
-            Nom : %s
-            Email : %s
-
-            # VEHICULE
-            
-            Nom : %s %s
-            Type : %s
-            Prix : %s FCFA
-            Options: 
-                - %s
-            """, getId(),
-            dateFormatted,
-            getUser().getName(),
-            getUser().getEmail(),
-            
-            getVehicle().getMarque(),
-            getVehicle().getModel(),
-            getVehicle().getType(),
-            getVehicle().getPrice(),
-            String.join(
-                "\n\t-", getVehicle().getOptions()));
-            //String.join(", ", getOptions()));
+    public List<Vehicule> getVehicles() {
+        return Collections.unmodifiableList(vehicles);
     }
 
+    public void setVehicles(List<Vehicule> vehicles) {
+        this.vehicles = new ArrayList<>(vehicles);
+    }
 }
