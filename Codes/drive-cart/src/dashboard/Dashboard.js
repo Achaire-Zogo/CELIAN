@@ -61,7 +61,7 @@ function Dashboard() {
     // Fetch data from your API endpoints
     getAllUsers().then((data) => setUserCount(data.length));
     getAllVehicles().then((data) => setVehicleCount(data.length));
-    getUserCart().then((data) => setCartItems(data.items?.length));
+    getUserCart().then((data) => setCartItems(data?.items.length));
     getAllOrders().then((data) => setOrderCount(data.length));
     getAllCountries().then((data) => setCountryCount(data.length));
 
