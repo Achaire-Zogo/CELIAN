@@ -1,7 +1,10 @@
 package com.inf4067.driver_cart.document.model;
 
+import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Locale;
 
 import com.inf4067.driver_cart.document.adapter.IDocumentFormat;
 import com.inf4067.driver_cart.document.builder.IDocumentBuilder;
@@ -21,7 +24,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = false)
-public class RegistrationRequest extends VehicleDocument{
+public class RegistrationRequest extends VehicleDocument {
 
     @ManyToOne
     private Vehicule vehicle;
@@ -55,29 +58,44 @@ public class RegistrationRequest extends VehicleDocument{
         this.setDocumentType(DocumentType.REGISTRATION_REQUEST);
     }
 
-    @Override
-    protected String getFormattedContent() {
-        String moreUserInf = """
-                
-                """;
-        return String.format("""
-                    DEMANDE D'IMMATRICULATION
-                    
-                    # VEHICULE
+    private String formatPrice(double price) {
+        DecimalFormatSymbols symbols = new DecimalFormatSymbols(Locale.getDefault());
+        symbols.setGroupingSeparator(' ');
 
-                    Nom : %s %s
-                    Type : %s
-                    Prix : %s FCFA
-
-                    # PROPRIETAIRE
-
-                    Nom : %s
-                    email : %s
-                    """, this.getVehicle().getMarque(),
-                        this.getVehicle().getModel(),
-                        this.getVehicle().getType().toString(),
-                        this.getVehicle().getPrice(),
-                        this.getUser().getName(),
-                        this.getUser().getEmail());
+        DecimalFormat decimalFormat = new DecimalFormat("#,###.0", symbols);
+        return decimalFormat.format(price);
     }
+
+    @Override
+    protected String getFormattedContent() {    
+        return String.format("""
+                ============================================
+                            DEMANDE D'IMMATRICULATION
+                ============================================
+    
+                ## VÉHICULE
+    
+                Marque : %s
+                Modèle : %s
+                Type   : %s
+                Prix   : %s FCFA
+    
+                --------------------------------------------
+    
+                ## PROPRIÉTAIRE
+    
+                Nom    : %s
+                Email  : %s
+    
+                ============================================
+                """,
+                this.getVehicle().getMarque(),
+                this.getVehicle().getModel(),
+                this.getVehicle().getType().toString(),
+                this.formatPrice(this.getVehicle().getPrice()), // Prix formaté
+                this.getUser().getName(),
+                this.getUser().getEmail()
+        );
+    }
+
 }

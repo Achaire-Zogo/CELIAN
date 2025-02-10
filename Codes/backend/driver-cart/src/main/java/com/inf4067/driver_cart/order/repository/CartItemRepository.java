@@ -12,4 +12,6 @@ public interface CartItemRepository extends JpaRepository<CartItem, Long> {
     // You can add custom query methods here if needed
     Optional<CartItem> findByUserIdAndVehicleIdAndStatus(Long userId, Long vehicleId, CartStatus status);
     List<CartItem> findByUserIdAndStatus(Long userId, CartStatus status);
+    List<CartItem> findByOrderId(Long orderId);
+    Optional<CartItem> findFirstByUserIdAndStatusOrderByIdDesc(Long userId, CartStatus status);
 }

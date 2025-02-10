@@ -13,77 +13,94 @@ import com.inf4067.driver_cart.order.state.OrderState;
 import com.inf4067.driver_cart.order.model.OrderType;
 import com.inf4067.driver_cart.order.repository.OrderRepository;
 import com.inf4067.driver_cart.order.repository.CartItemRepository;
-import com.inf4067.driver_cart.repository.VehiculeRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 import java.util.List;
 import com.inf4067.driver_cart.country.repository.CountryRepository;
+import com.inf4067.driver_cart.repository.VehiculeRepository;
+import com.inf4067.driver_cart.order.factory.CashOrderFactory;
+import com.inf4067.driver_cart.order.factory.CreditOrderFactory;
+import com.inf4067.driver_cart.order.template.CashOrderAmountCalculator;
+import com.inf4067.driver_cart.order.template.CreditOrderAmountCalculator;
 
 @Service
 @Transactional
 public class OrderService extends Subject {
 
-    @Autowired
-    private OrderRepository orderRepository;
+    private final OrderRepository orderRepository;
+    private final CartItemRepository cartItemRepository;
+    private final CountryRepository countryRepository;
+    private final VehiculeRepository vehicleRepository;
+    private final CashOrderFactory cashOrderFactory;
+    private final CreditOrderFactory creditOrderFactory;
+    private final CashOrderAmountCalculator cashOrderAmountCalculator;
+    private final CreditOrderAmountCalculator creditOrderAmountCalculator;
 
     @Autowired
-    private CartItemRepository cartItemRepository;
-
-    @Autowired
-    private CountryRepository countryRepository;
-
-    @Autowired
-    private VehiculeRepository vehicleRepository;
+    public OrderService(
+            ApplicationEventPublisher eventPublisher,
+            OrderRepository orderRepository,
+            CartItemRepository cartItemRepository,
+            CountryRepository countryRepository,
+            VehiculeRepository vehicleRepository,
+            CashOrderFactory cashOrderFactory,
+            CreditOrderFactory creditOrderFactory,
+            CashOrderAmountCalculator cashOrderAmountCalculator,
+            CreditOrderAmountCalculator creditOrderAmountCalculator) {
+        super(eventPublisher);
+        this.orderRepository = orderRepository;
+        this.cartItemRepository = cartItemRepository;
+        this.countryRepository = countryRepository;
+        this.vehicleRepository = vehicleRepository;
+        this.cashOrderFactory = cashOrderFactory;
+        this.creditOrderFactory = creditOrderFactory;
+        this.cashOrderAmountCalculator = cashOrderAmountCalculator;
+        this.creditOrderAmountCalculator = creditOrderAmountCalculator;
+    }
 
     public Order createOrderFromCart(Long userId, OrderType type, Long countryId) {
         // Retrieve all active cart items for the user
         List<CartItem> activeCartItems = cartItemRepository.findByUserIdAndStatus(userId, CartStatus.ACTIVE);
-    
-        // Fetch the country's tax rate
-        Country country = countryRepository.findById(countryId).orElseThrow(() -> new RuntimeException("Country not found"));
-        double taxRate = country.getTaxRate();
-    
-        // Calculate the total tax for the cart items
-        double totalTax = 0.0;
-        for (CartItem cartItem : activeCartItems) {
-            // Ensure vehicle details are populated
-            Vehicule vehicle = fetchVehicleDetails(cartItem.getVehicleId());
-            cartItem.setVehicle(vehicle);
-    
-            // Calculate tax based on vehicle price
-            double itemTax = vehicle.getPrice() * taxRate * cartItem.getQuantity();
-            totalTax += itemTax;
+        
+        // Load vehicle information for each cart item
+        activeCartItems.forEach(item -> {
+            Vehicule vehicle = vehicleRepository.findById(item.getVehicleId())
+                .orElseThrow(() -> new RuntimeException("Vehicle not found with id: " + item.getVehicleId()));
+            item.setVehicle(vehicle);
+        });
+        
+        // Create order using appropriate factory
+        Order order;
+        if (type == OrderType.CASH) {
+            order = cashOrderFactory.createOrder(userId, countryId, type, null);
+            order.setTotal(cashOrderAmountCalculator.calculateOrderAmount(activeCartItems));
+        } else {
+            order = creditOrderFactory.createOrder(userId, countryId, type, null);
+            order.setTotal(creditOrderAmountCalculator.calculateOrderAmount(activeCartItems));
         }
-    
-        // Create the order
-        Order order = new Order();
-        order.setUserId(userId);
-        order.setType(type);
-        order.setState(OrderState.CREATED);
-        order.setCreatedAt(LocalDateTime.now());
-        order.setCountryId(countryId);
-        order.setTotal(totalTax); // Set the calculated total tax
-    
-        // Save the order to get the generated orderId
-        Order savedOrder = orderRepository.save(order);
-        Long orderId = savedOrder.getId();
-        
-        // Communiquer avec les observateurs
-        this.notifyObservers(savedOrder, activeCartItems, DocumentFormat.PDF);
-        this.notifyObservers(savedOrder, activeCartItems, DocumentFormat.HTML);
-        
-        // Update the status and orderId of each cart item
-        for (CartItem cartItem : activeCartItems) {
-            cartItem.setStatus(CartStatus.ORDERED);
-            cartItem.setOrderId(orderId);
-        }
-    
-        // Save the updated cart items
-        cartItemRepository.saveAll(activeCartItems);
-        
-        return savedOrder;
+
+        // Save the order first
+        final Order savedOrder = orderRepository.save(order);
+
+        // Update cart items status and associate with order
+        activeCartItems.forEach(item -> {
+            item.setStatus(CartStatus.ORDERED);
+            item.setOrderId(savedOrder.getId());
+            cartItemRepository.save(item);
+            savedOrder.getItems().add(item);
+        });
+
+        // Save the order again with items
+        return orderRepository.save(savedOrder);
+
+        // Notify observers
+        // this.notifyObservers(order, activeCartItems, DocumentFormat.PDF);
+        // this.notifyObservers(order, activeCartItems, DocumentFormat.HTML);
+
+        // return order;
     }
 
     // Example method to fetch vehicle details
@@ -101,16 +118,36 @@ public class OrderService extends Subject {
     }
 
     public List<Order> getAllOrders() {
-        return orderRepository.findAll();
+        List<Order> orders = orderRepository.findAll();
+        orders.forEach(this::loadOrderDetails);
+        return orders;
     }
 
     public List<Order> getUserOrders(Long userId) {
-        return orderRepository.findByUserId(userId);
+        List<Order> orders = orderRepository.findByUserId(userId);
+        orders.forEach(this::loadOrderDetails);
+        return orders;
     }
 
     public Order getOrderById(Long id) {
-        return orderRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Order not found"));
+        Order order = orderRepository.findById(id)
+            .orElseThrow(() -> new RuntimeException("Order not found"));
+        loadOrderDetails(order);
+        return order;
+    }
+
+    private void loadOrderDetails(Order order) {
+        // Load vehicle details for each cart item
+        if (order.getItems() != null) {
+            order.getItems().forEach(item -> {
+                Vehicule vehicle = vehicleRepository.findById(item.getVehicleId())
+                    .orElseThrow(() -> new RuntimeException("Vehicle not found"));
+                item.setVehicle(vehicle);
+            });
+        }
+
+        // Country details are automatically loaded through the @ManyToOne relationship
+        // User details are automatically loaded through the @ManyToOne relationship
     }
 
     public void deleteOrderById(Long id) {

@@ -12,4 +12,5 @@ public class BundleRequest {
     private String transfertDate;
     
     private long orderId;
+    private double orderTotal;
 }

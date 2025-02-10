@@ -1,7 +1,10 @@
 package com.inf4067.driver_cart.document.model;
 
+import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Locale;
 
 import com.inf4067.driver_cart.document.adapter.IDocumentFormat;
 import com.inf4067.driver_cart.document.builder.IDocumentBuilder;
@@ -57,33 +60,53 @@ public class TransfertCertificate extends VehicleDocument {
         this.setDocumentType(DocumentType.TRANSFER_CERTIFICATE);
     }
 
+    private String formatPrice(double price) {
+        DecimalFormatSymbols symbols = new DecimalFormatSymbols(Locale.getDefault());
+        symbols.setGroupingSeparator(' ');
+
+        DecimalFormat decimalFormat = new DecimalFormat("#,###.0", symbols);
+        return decimalFormat.format(price);
+    }
+
+
     @Override
-    protected String getFormattedContent() {
+    protected String getFormattedContent() {    
         return String.format("""
-            CERTIFICAT DE CESSION
-            
-            # VEHICULE
+                ============================================
+                            CERTIFICAT DE CESSION
+                ============================================
+    
+                ## VÉHICULE
+    
+                Marque : %s
+                Modèle : %s
+                Type   : %s
+                Prix   : %s FCFA
+    
+                --------------------------------------------
+                
+                ## VENDEUR
 
-            Nom : %s %s
-            Type : %s
-            Prix : %s
-
-            # VENDEUR
-
-            Nom : CELIAN CORP
-
-            # ACHETEUR
-
-            Nom : %s
-            Email : %s
-
-            Date de cession: %s
-            """, getVehicle().getMarque(),
+                Nom : CELIAN CORP
+                
+                --------------------------------------------
+    
+                ## ACHETEUR
+    
+                Nom    : %s
+                Email  : %s
+    
+                ============================================
+                DATE DE CESSION : %s
+                ============================================
+                """,
+                getVehicle().getMarque(),
             getVehicle().getModel(),
             getVehicle().getType(),
-            getVehicle().getPrice(),
+            formatPrice(getVehicle().getPrice()),
             getUser().getName(),
             getUser().getEmail(),
-            getTransferDate());
+            getTransferDate()
+        );
     }
 }

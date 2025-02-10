@@ -75,4 +75,13 @@ public class CartService {
         // This could be a call to another repository or service
         return vehiculeService.getVehiculeById(vehicleId);
     }
+
+    public void removeLastItemFromCart(Long userId) {
+        Optional<CartItem> lastItem = cartItemRepository.findFirstByUserIdAndStatusOrderByIdDesc(userId, CartStatus.ACTIVE);
+        if (lastItem.isPresent()) {
+            cartItemRepository.delete(lastItem.get());
+        } else {
+            throw new EntityNotFoundException("No items found in cart for user ID: " + userId);
+        }
+    }
 }
