@@ -92,14 +92,14 @@ public class OrderService extends Subject {
             cartItemRepository.save(item);
             savedOrder.getItems().add(item);
         });
+ // Notify observers
+         this.notifyObservers(savedOrder, activeCartItems, DocumentFormat.PDF);
+         this.notifyObservers(savedOrder, activeCartItems, DocumentFormat.HTML);
 
         // Save the order again with items
         return orderRepository.save(savedOrder);
 
-        // Notify observers
-        // this.notifyObservers(order, activeCartItems, DocumentFormat.PDF);
-        // this.notifyObservers(order, activeCartItems, DocumentFormat.HTML);
-
+       
         // return order;
     }
 
