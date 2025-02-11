@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Box, Grid, Button, IconButton, Typography, CircularProgress } from '@mui/material';
 import { useDispatch, useSelector } from 'react-redux';
-import { getUserCart } from '../api-endpoints/endpoints';
+import { getUserCart, undoCart } from '../api-endpoints/endpoints';
 import UndoIcon from '@mui/icons-material/Undo';
 import PaymentIcon from '@mui/icons-material/Payment';
 import { Link } from 'react-router-dom';
@@ -15,6 +15,7 @@ function Cart() {
   const [cartItems, setCartItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [showUndoButton, setShowUndoButton] = useState(false); // State to control Undo button visibility
 
   // Fetch cart items from the backend
   useEffect(() => {
@@ -23,6 +24,8 @@ function Cart() {
       .then((data) => {
         setCartItems(data);
         setLoading(false);
+        //console.log(data.length > 0);
+        setShowUndoButton(data.length > 0); // Show Undo button if cart has items
       })
       .catch((err) => {
         console.error(err);
@@ -32,9 +35,17 @@ function Cart() {
   }, [snackbarId]);
 
   // Handle undo action
-  const popCart = (e) => {
+  const undo = (e) => {
     e.preventDefault();
-    dispatch(authActions.popCart());
+    undoCart()
+      .then((data) => {
+        dispatch(authActions.popCart());
+        //setShowUndoButton(true); // Hide Undo button after undo action
+      })
+      .catch((err) => {
+        console.error(err);
+        setError('Failed to remove cart items. Please try again later.');
+      });
   };
 
   return (
@@ -47,24 +58,28 @@ function Cart() {
         position: 'relative',
       }}
     >
-      {/* Undo Button */}
-      <IconButton
-        onClick={popCart}
-        sx={{
-          position: 'fixed',
-          top: 16,
-          left: 16,
-          backgroundColor: 'primary.main',
-          color: 'white',
-          '&:hover': {
-            backgroundColor: 'primary.dark',
-          },
-          zIndex: 1000, // Ensures button stays on top of other content
-        }}
-      >
-        <UndoIcon sx={{ marginRight: 1 }} />
-        <Typography variant="body1">Undo</Typography>
-      </IconButton>
+      {/* Undo Button (Conditionally Visible) */}
+      {showUndoButton && (
+        <IconButton
+          onClick={undo}
+          sx={{
+            
+            position: 'fixed',
+            left: 16,
+            backgroundColor: 'primary.main',
+            color: 'white',
+           // position: 'fixed',
+
+            '&:hover': {
+              backgroundColor: 'primary.dark',
+            },
+            zIndex: 1000, // Ensures button stays on top of other content
+          }}
+        >
+          <UndoIcon sx={{ marginRight: 1 }} />
+          <Typography variant="body1">Undo</Typography>
+        </IconButton>
+      )}
 
       {/* Loading State */}
       {loading ? (
@@ -80,19 +95,12 @@ function Cart() {
         </Box>
       ) : error ? (
         // Error State
-        <Typography
-          variant="h6"
-          color="error"
-          sx={{ textAlign: 'center', marginTop: 4 }}
-        >
+        <Typography variant="h6" color="error" sx={{ textAlign: 'center', marginTop: 4 }}>
           {error}
         </Typography>
-      ) : cartItems.length === 0 ? (
+      ) : cartItems?.length === 0 ? (
         // Empty Cart State
-        <Typography
-          variant="h5"
-          sx={{ textAlign: 'center', marginTop: 4, color: 'text.secondary' }}
-        >
+        <Typography variant="h5" sx={{ textAlign: 'center', marginTop: 4, color: 'text.secondary' }}>
           Your cart is empty.
         </Typography>
       ) : (

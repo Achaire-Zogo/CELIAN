@@ -27,6 +27,7 @@ function OrderItem() {
     setLoading(true);
     getOrderById(id)
       .then((res) => {
+        console.log(res);
         setOrder(res);
         setLoading(false);
       })
@@ -138,7 +139,7 @@ function OrderItem() {
               {format(new Date(order.createdAt), 'PPPpp')}
             </Typography>
             <Typography variant="h5" color="primary" gutterBottom>
-              <strong>Total:</strong> ${order.total.toLocaleString()}
+              <strong>Total:</strong> ${order.total}
             </Typography>
           </Paper>
 
@@ -148,21 +149,21 @@ function OrderItem() {
           </Typography>
 
           {order.items.length > 0 ? (
-            order.items.map((vehicle) => (
-              <Paper key={vehicle.id} sx={{ padding: 3, marginBottom: 2 }}>
+            order.items.map((item) => (
+              <Paper key={item.id} sx={{ padding: 3, marginBottom: 2 }}>
                 <Grid container spacing={2}>
                   <Grid item xs={12} md={8}>
                     <Typography variant="h6">
-                      <strong>Vehicle:</strong> {vehicle.name}
+                      <strong>Vehicle:</strong> {item.vehicle.marque}
                     </Typography>
                     <Typography variant="body1" color="textSecondary">
-                      <strong>Model:</strong> {vehicle.model}
+                      <strong>Model:</strong> {item.vehicle.model}
                     </Typography>
                     <Typography variant="body1" color="textSecondary">
-                      <strong>Year:</strong> {vehicle.year}
+                      <strong>Quantity:</strong> {item.quantity}
                     </Typography>
                     <Typography variant="body1" color="textSecondary">
-                      <strong>Price:</strong> ${vehicle.price.toLocaleString()}
+                      <strong>Price:</strong> ${item.vehicle.price}
                     </Typography>
                   </Grid>
 
@@ -171,7 +172,7 @@ function OrderItem() {
                     <Button
                       variant="contained"
                       color="primary"
-                      onClick={() => generatePDF(vehicle.id)}
+                      onClick={() => generatePDF(item.vehicle.id)}
                       sx={{ marginBottom: 1 }}
                     >
                       Generate PDF
@@ -180,7 +181,7 @@ function OrderItem() {
                     <Button
                       variant="outlined"
                       color="secondary"
-                      onClick={() => generateHTML(vehicle.id)}
+                      onClick={() => generateHTML(item.vehicle.id)}
                     >
                       Generate HTML
                     </Button>

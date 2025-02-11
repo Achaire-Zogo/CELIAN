@@ -34,6 +34,23 @@ export const getAllVehicles = async () => {
     return data;
 }
 
+
+export const searchVehicles = async (filters) => {
+    try {
+        const res = await axios.get("/api/vehicules/search", { params: filters });
+
+        if (res.status !== 200) {
+            console.log("Unable to fetch vehicles");
+            return null;
+        }
+
+        return res.data;
+    } catch (err) {
+        console.log("Error fetching vehicles:", err);
+        return null;
+    }
+};
+
 export const addElectricCar = async(data)=>{
 
     const res = await axios.post(`/api/vehicules/electric/car`,{
@@ -171,6 +188,20 @@ export const removeCart = async(id)=>{
     const resData = await res.data;
     return resData;
 }
+
+export const undoCart = async()=>{
+
+    let userId = parseInt(localStorage.getItem('userId'))
+    const res = await axios.post(`/api/v1/cart/remove-last?userId=${userId}`)
+    .catch((err)=> console.log(err));
+
+    if(res.status !== 200 && res.status !== 201 ){
+        return console.log(`Unable to remove from cart ${res.status}`);
+    }
+
+    const resData = await res.data;
+    return resData;
+}
 export const login = async (data) => {
     const res = await axios.post(`/api/v1/users/login`,{
         email: data.email,
@@ -247,7 +278,7 @@ export const getUserCart = async () => {
     const res = await axios.get(`/api/v1/cart?userId=${userId}`).catch((err)=> console.log(err));
   
     if(res?.status !== 200){
-     return console.log("Unable to fetch user cart");
+     return [];
     }
  
     const data = res.data;
@@ -291,3 +322,4 @@ export const getDocumentsByOrderId = async (id) => {
     const data = res.data;
     return data;    
 }
+

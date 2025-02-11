@@ -136,6 +136,9 @@ function Fleet({ isCart = false, props }) {
           backgroundColor: '#f5f5f5',
         }}
       >
+         <Typography variant="h6" sx={{ fontWeight: 'bold', color: 'primary.main' }}>
+                  {price} XAF
+                </Typography>
         {!isCart ? (
           <IconButton
             size="small"

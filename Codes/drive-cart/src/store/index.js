@@ -6,7 +6,8 @@ const authSlice = createSlice({
         isLoggedIn: false,
         openSnackbar: false,
         msg: "",
-        snackbarId: 0  // Add this to force updates
+        snackbarId: 0 , // Add this to force updates
+        vehicleSnackbarId: 0
     },
     reducers: {
         login(state) {
@@ -23,11 +24,16 @@ const authSlice = createSlice({
         addVehicle(state) {
             state.openSnackbar = true;
             state.msg = "New Vehicle Added Successfully !!";
-            state.snackbarId += 1;  // Increment to force update
+            state.vehicleSnackbarId += 1;  // Increment to force update
         },
         paymentSuccessful(state){
             state.openSnackbar = true;
             state.msg = "Order paid Successfully !!";
+            state.snackbarId +=1;
+        },
+        popCart(state){
+            state.openSnackbar = true;
+            state.msg = "Undo successful !!";
             state.snackbarId +=1;
         },
         removeItem(state) {

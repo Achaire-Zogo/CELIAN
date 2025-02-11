@@ -44,7 +44,7 @@ function AddVehicule() {
   const [selectedExistingVehicle, setSelectedExistingVehicle] = useState(''); // To store the selected existing vehicle
 
   const dispatch = useDispatch();
-  const snackbarId = useSelector((state) => state.snackbarId);
+  const snackbarId = useSelector((state) => state.vehicleSnackbarId);
 
 
   const types = [

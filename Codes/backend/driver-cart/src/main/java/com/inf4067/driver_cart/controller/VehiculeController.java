@@ -7,7 +7,6 @@ import org.springframework.web.bind.annotation.*;
 
 import com.inf4067.driver_cart.model.*;
 import com.inf4067.driver_cart.service.VehiculeService;
-import org.springframework.web.bind.annotation.GetMapping;
 
 
 @RestController
@@ -30,6 +29,19 @@ public class VehiculeController {
     @PostMapping("/{id}")
     public ResponseEntity<Boolean> addOption(@PathVariable Long id, @RequestBody String option) {
         return ResponseEntity.ok(vehiculeService.getVehiculeById(id).addOption(option));
+    }
+
+    @GetMapping("/search")
+    public List<Vehicule> searchVehicules(
+            @RequestParam(required = false) String model,
+            @RequestParam(required = false) String marque,
+            @RequestParam(required = false) VehicleType type,
+            @RequestParam(required = false) Double minPrice,
+            @RequestParam(required = false) Double maxPrice,
+            @RequestParam(required = false) Double price
+
+    ) {
+        return vehiculeService.searchVehicules(model, marque, type, minPrice, maxPrice, price);
     }
 
     @PostMapping("/{id}/addOption")

@@ -50,6 +50,12 @@ public class VehiculeService {
         vehiculeRepository.deleteById(id);
     }
 
+    public List<Vehicule> searchVehicules(String model, String marque,
+     VehicleType type, Double minPrice, Double maxPrice, Double price ){
+        return vehiculeRepository.searchVehicules(model, marque, type, minPrice,
+         maxPrice, price);
+     }
+
     public Scooter savePetrolScooter(PetrolScooter vehicule) {
         // TODO Auto-generated method stub
        
