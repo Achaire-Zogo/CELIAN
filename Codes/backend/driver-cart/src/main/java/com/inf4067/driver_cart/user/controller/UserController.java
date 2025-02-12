@@ -66,5 +66,10 @@ public class UserController {
         return ResponseEntity.ok(userService.getCurrentUser(token));
     }
 
-    
+    @PostMapping("/logout")
+    public ResponseEntity<Void> logout(@RequestHeader("Authorization") String token) {
+        userService.logout(token);
+        return ResponseEntity.ok().build();
+    }
+
 }

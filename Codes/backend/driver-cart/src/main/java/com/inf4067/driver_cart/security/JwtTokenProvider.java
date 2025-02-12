@@ -10,6 +10,8 @@ import org.springframework.stereotype.Component;
 import javax.crypto.SecretKey;
 import java.nio.charset.StandardCharsets;
 import java.util.Date;
+import java.util.HashSet;
+import java.util.Set;
 
 @Component
 public class JwtTokenProvider {
@@ -19,6 +21,8 @@ public class JwtTokenProvider {
 
     @Value("${jwt.expiration:86400000}")
     private long jwtExpirationMs;
+
+    private final Set<String> blacklistedTokens = new HashSet<>();
 
     private SecretKey getSigningKey() {
         byte[] keyBytes = jwtSecret.getBytes(StandardCharsets.UTF_8);
@@ -49,6 +53,10 @@ public class JwtTokenProvider {
 
     public boolean validateToken(String token, UserDetails userDetails) {
         try {
+            if (blacklistedTokens.contains(token)) {
+                return false;
+            }
+
             String username = getUserEmailFromToken(token);
             Claims claims = Jwts.parserBuilder()
                     .setSigningKey(getSigningKey())
@@ -60,5 +68,9 @@ public class JwtTokenProvider {
         } catch (JwtException | IllegalArgumentException e) {
             return false;
         }
+    }
+
+    public void invalidateToken(String token) {
+        blacklistedTokens.add(token);
     }
 }
