@@ -23,7 +23,7 @@ import CommuteIcon from '@mui/icons-material/Commute';
 import { useSelector } from 'react-redux';
 
 function MyDrawer({ open, toggleDrawer }) {
-  const userRole = 'ADMIN'; // Assuming role is stored in Redux
+  const userRole = 'USER'; // Assuming role is stored in Redux
 
   // Common navigation items
   const icons = [
@@ -32,13 +32,14 @@ function MyDrawer({ open, toggleDrawer }) {
     { name: 'Dashboard', icon: <DashboardIcon />, route: '/dashboard' },
     { name: 'Cart', icon: <ShoppingCartIcon />, route: '/cart' },
     { name: 'Payments', icon: <PaymentIcon />, route: '/payments' },
+    { name: 'Orders', icon: <AddShoppingCartIcon />, route: '/orders' },
+
   ];
 
   // Admin-specific navigation items
   const adminIcons = [
     { name: 'Users', icon: <PeopleIcon />, route: '/clients' },
     { name: 'Catalogs', icon: <ViewListIcon />, route: '/catalogs' },
-    { name: 'Orders', icon: <AddShoppingCartIcon />, route: '/orders' },
     { name: 'Vehicles', icon: <CommuteIcon />, route: '/vehicles' },
   ];
 
