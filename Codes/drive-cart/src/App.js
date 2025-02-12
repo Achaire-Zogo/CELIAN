@@ -23,7 +23,8 @@ import Profile from './clients/Profile';
 function App() {
   const dispatch = useDispatch();
   const isLoggedIn = useSelector(state => state.isLoggedIn);
-    
+  const isAdmin = useSelector(state => state.isAdmin);
+  
     // Get values from Redux store including the new snackbarId
     const openSnackbar = useSelector((state) => state.openSnackbar);
     const message = useSelector((state) => state.msg);
@@ -49,6 +50,9 @@ function App() {
      if(localStorage.getItem('token')) {
        dispatch(authActions.login());
      }
+     if(localStorage.getItem('clientType') === 'ADMIN'){
+      dispatch(authActions.setAdmin());
+     }
       
     
    }, [localStorage]); // Watch specific properties, not the entire cart object
@@ -65,16 +69,24 @@ function App() {
            <Route path="/" element={<Home />} />
            <Route path="/login" element={<Login />} />
            <Route path="/register" element={<Register />} />
+           { (isLoggedIn && isAdmin) && <>
            <Route path="/dashboard" element={<Dashboard />} />
+           <Route path={"/vehicles"} element={<AddVehicule/>}/>
+           <Route path="/clients" element={<User />} />
+           <Route path="/catalogs" element={<Catalogue />} />
+           </>
+           
+           }
+           { isLoggedIn && <>
            <Route path="/orders" element={<Order />} />
            <Route path="/orders/:id" element={<OrderItem />}/>
-           <Route path="/catalogs" element={<Catalogue />} />
-           <Route path="/clients" element={<User />} />
            <Route path="/cart" element={<Cart />} />
            <Route path="/payments" element={<Payment />} />
-           <Route path={"/vehicles"} element={<AddVehicule/>}/>
            <Route path="/profile" element={<Profile/>}/>
-
+           
+           </>
+           
+          }
            
          </Routes>
        </section>

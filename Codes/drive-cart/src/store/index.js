@@ -4,6 +4,7 @@ const authSlice = createSlice({
     name: "auth",
     initialState: {
         isLoggedIn: false,
+        isAdmin: false,
         openSnackbar: false,
         msg: "",
         snackbarId: 0 , // Add this to force updates
@@ -12,6 +13,9 @@ const authSlice = createSlice({
     reducers: {
         login(state) {
             state.isLoggedIn = true;
+        },
+        setAdmin(state){
+            state.isAdmin = true;
         },
         logout(state) {
             state.isLoggedIn = false;

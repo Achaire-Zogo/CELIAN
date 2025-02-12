@@ -34,6 +34,9 @@ const Login = () => {
     localStorage.setItem('companyName', data.user.companyName);
 
     dispatch(authActions.login());
+    if(data.user.clientType === "ADMIN"){
+      dispatch(authActions.setAdmin());
+    }
     navigate('/');
   };
 

@@ -23,23 +23,27 @@ import CommuteIcon from '@mui/icons-material/Commute';
 import { useSelector } from 'react-redux';
 
 function MyDrawer({ open, toggleDrawer }) {
-  const userRole = 'USER'; // Assuming role is stored in Redux
+   const isAdmin = useSelector(state => state.isAdmin);
+   const isLoggedIn = useSelector(state => state.isLoggedIn);
+   // Assuming role is stored in Redux
 
   // Common navigation items
   const icons = [
     { name: 'Home', icon: <HomeIcon />, route: '/' },
+   
+  ];
+  const loggedInIcons = [
     { name: 'Profile', icon: <ManageAccountsIcon />, route: '/profile' },
-    { name: 'Dashboard', icon: <DashboardIcon />, route: '/dashboard' },
     { name: 'Cart', icon: <ShoppingCartIcon />, route: '/cart' },
     { name: 'Payments', icon: <PaymentIcon />, route: '/payments' },
     { name: 'Orders', icon: <AddShoppingCartIcon />, route: '/orders' },
-
   ];
 
   // Admin-specific navigation items
   const adminIcons = [
     { name: 'Users', icon: <PeopleIcon />, route: '/clients' },
     { name: 'Catalogs', icon: <ViewListIcon />, route: '/catalogs' },
+    { name: 'Dashboard', icon: <DashboardIcon />, route: '/dashboard' },
     { name: 'Vehicles', icon: <CommuteIcon />, route: '/vehicles' },
   ];
 
@@ -73,10 +77,25 @@ function MyDrawer({ open, toggleDrawer }) {
             </ListItemButton>
           </ListItem>
         ))}
+        {isLoggedIn && 
+          loggedInIcons.map((item, index) => (
+            <ListItem key={index} disablePadding>
+              <ListItemButton component={Link} to={item.route}>
+                <ListItemIcon sx={{ color: 'primary.main' }}>
+                  {item.icon}
+                </ListItemIcon>
+                <ListItemText
+                  primary={item.name}
+                  primaryTypographyProps={{ fontWeight: 'medium' }}
+                />
+              </ListItemButton>
+            </ListItem>
+          ))
+        }
       </List>
 
       {/* Admin Navigation Items (Conditional) */}
-      {userRole === 'ADMIN' && (
+      {isAdmin && (
         <>
           <Divider sx={{ my: 1 }} />
           <Typography
