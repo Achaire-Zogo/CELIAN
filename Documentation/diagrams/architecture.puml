@@ -1,0 +1,28 @@
+@startuml Driver Cart - Architecture
+
+!include <C4/C4_Container>
+
+Person(client, "Client", "Utilisateur de l'application")
+Person(admin, "Administrateur", "Gestionnaire de l'application")
+
+System_Boundary(c1, "Driver Cart") {
+    Container(spa, "Application React", "React, Redux", "Interface utilisateur web")
+    
+    Container(api, "API Backend", "Java, Spring Boot", "API REST pour la logique métier")
+    
+    Container(db, "Base de données", "SQL Database", "Stockage des données")
+    
+    Container(auth, "Service Auth", "Spring Security, JWT", "Gestion de l'authentification")
+    
+    Container(docs, "Service Documents", "PDF/HTML Generator", "Génération des documents")
+}
+
+Rel(client, spa, "Utilise", "HTTPS")
+Rel(admin, spa, "Administre", "HTTPS")
+
+Rel(spa, api, "Appelle", "HTTPS/JSON")
+Rel(api, db, "Lit/Écrit", "JDBC")
+Rel(api, auth, "Vérifie", "JWT")
+Rel(api, docs, "Génère", "Internal")
+
+@enduml

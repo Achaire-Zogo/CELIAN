@@ -1,0 +1,88 @@
+@startuml Driver Cart - Database Schema
+
+!define table(x) class x << (T,#FFAAAA) >>
+!define primary_key(x) <u>x</u>
+!define foreign_key(x) #x#
+
+table(User) {
+  primary_key(id): Long
+  email: String
+  password: String
+  firstName: String
+  lastName: String
+  phoneNumber: String
+  clientType: Enum
+  companyName: String
+  registrationNumber: String
+  createdAt: DateTime
+  updatedAt: DateTime
+}
+
+table(Vehicule) {
+  primary_key(id): Long
+  type: Enum
+  marque: String
+  model: String
+  price: Double
+  uri: String
+  batteryCapacity: Integer
+  drivingRange: Integer
+  engineSize: Integer
+  fuelType: Enum
+  createdAt: DateTime
+}
+
+table(Order) {
+  primary_key(id): Long
+  foreign_key(userId): Long
+  foreign_key(countryId): Long
+  type: Enum
+  state: Enum
+  total: Double
+  createdAt: DateTime
+}
+
+table(OrderItem) {
+  primary_key(id): Long
+  foreign_key(orderId): Long
+  foreign_key(vehicleId): Long
+  quantity: Integer
+  price: Double
+}
+
+table(Cart) {
+  primary_key(id): Long
+  foreign_key(userId): Long
+  foreign_key(vehicleId): Long
+  quantity: Integer
+}
+
+table(Country) {
+  primary_key(id): Long
+  name: String
+  taxRate: Double
+}
+
+table(Fleet) {
+  primary_key(id): Long
+  foreign_key(vehicleId): Long
+  type: Enum
+}
+
+table(FleetVehicle) {
+  primary_key(id): Long
+  foreign_key(fleetId): Long
+  foreign_key(vehicleId): Long
+}
+
+User "1" -- "0..*" Order
+Order "1" -- "1..*" OrderItem
+OrderItem "0..*" -- "1" Vehicule
+User "1" -- "0..*" Cart
+Cart "0..*" -- "1" Vehicule
+Order "0..*" -- "1" Country
+Vehicule "1" -- "0..1" Fleet
+Fleet "1" -- "0..*" FleetVehicle
+FleetVehicle "0..*" -- "1" Vehicule
+
+@enduml

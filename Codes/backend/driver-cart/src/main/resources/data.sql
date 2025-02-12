@@ -1,26 +1,6 @@
 -- Mot de passe: admin123 (encodé avec BCrypt)
-INSERT INTO users (
-    email,
-    password,
-    name,
-    client_type,
-    first_name,
-    last_name,
-    phone_number,
-    created_at,
-    updated_at
-)
-VALUES (
-    'admin@celian.com',
-    '$2a$10$rS.bO0yHgG5qklUw/sN3wOqyOF/YO42R8iBkVP3bCZWaJ62vWeXSi',
-    'Administrator',
-    'INDIVIDUAL',
-    'Admin',
-    'User',
-    '+237000000000',
-    CURRENT_TIMESTAMP,
-    CURRENT_TIMESTAMP
-) ON DUPLICATE KEY UPDATE email = email;
+INSERT INTO `users` (`id`, `client_type`, `company_name`, `created_at`, `email`, `first_name`, `last_name`, `name`, `password`, `phone_number`, `registration_number`, `updated_at`) VALUES
+(3, 'ADMIN', NULL, '2025-02-04 17:08:02.000000', 'administrator@celian.com', 'My Admin', 'User', 'My Administrator', '$2a$10$rS.bO0yHgG5qklUw/sN3wOqyOF/YO42R8iBkVP3bCZWaJ62vWeXSi', '+237000000001', NULL, '2025-02-04 17:08:02.000000') ON DUPLICATE KEY UPDATE email = email;
 
 INSERT INTO countries (name, tax_rate) VALUES ('Nigeria', 0.12);
 INSERT INTO countries (name, tax_rate) VALUES ('South Africa', 0.14);
