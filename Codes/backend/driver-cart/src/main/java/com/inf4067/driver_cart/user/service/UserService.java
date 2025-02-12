@@ -137,5 +137,9 @@ public class UserService {
         return userRepository.save(user);
     }
 
-    
+    public void logout(String token) {
+        String userEmail = jwtTokenProvider.getUserEmailFromToken(token.replace("Bearer ", ""));
+        jwtTokenProvider.invalidateToken(token.replace("Bearer ", ""));
+    }
+
 }
