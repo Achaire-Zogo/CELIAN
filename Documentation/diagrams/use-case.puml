@@ -1,0 +1,50 @@
+@startuml Driver Cart - Use Case Diagram
+
+left to right direction
+skinparam packageStyle rectangle
+
+actor "Client" as client
+actor "Administrateur" as admin
+
+rectangle "Driver Cart" {
+  usecase "S'inscrire" as UC1
+  usecase "Se connecter" as UC2
+  usecase "Parcourir le catalogue" as UC3
+  usecase "Rechercher des véhicules" as UC4
+  usecase "Ajouter au panier" as UC5
+  usecase "Gérer le panier" as UC6
+  usecase "Passer une commande" as UC7
+  usecase "Choisir mode de paiement" as UC8
+  usecase "Voir historique commandes" as UC9
+  usecase "Gérer profil" as UC10
+  
+  usecase "Gérer les véhicules" as UC11
+  usecase "Gérer les utilisateurs" as UC12
+  usecase "Voir les statistiques" as UC13
+  usecase "Gérer les pays" as UC14
+  usecase "Gérer les commandes" as UC15
+}
+
+client --> UC1
+client --> UC2
+client --> UC3
+client --> UC4
+client --> UC5
+client --> UC6
+client --> UC7
+client --> UC8
+client --> UC9
+client --> UC10
+
+admin --> UC11
+admin --> UC12
+admin --> UC13
+admin --> UC14
+admin --> UC15
+admin --> UC2
+
+UC5 .> UC6 : includes
+UC7 .> UC8 : includes
+UC7 .> UC6 : includes
+
+@enduml

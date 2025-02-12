@@ -1,0 +1,79 @@
+@startuml Driver Cart - Design Patterns
+
+' Factory Pattern
+package "Factory Pattern" {
+  interface "VehiculeFactory" {
+    +getCar(): Car
+    +getScooter(): Scooter
+  }
+  
+  class "ElectricVehiculeFactory" {
+    +getCar(): ElectricCar
+    +getScooter(): ElectricScooter
+  }
+  
+  class "PetrolVehiculeFactory" {
+    +getCar(): PetrolCar
+    +getScooter(): PetrolScooter
+  }
+  
+  VehiculeFactory <|.. ElectricVehiculeFactory
+  VehiculeFactory <|.. PetrolVehiculeFactory
+}
+
+' Singleton Pattern
+package "Singleton Pattern" {
+  class "DocumentBundle" {
+    -instance: DocumentBundle
+    -DocumentBundle()
+    +getInstance(): DocumentBundle
+  }
+}
+
+' State Pattern
+package "State Pattern" {
+  enum "OrderState" {
+    CREATED
+    PENDING
+    PAID
+    DELIVERED
+    CANCELLED
+  }
+  
+  class "Order" {
+    -state: OrderState
+    +setState(state: OrderState)
+    +getState(): OrderState
+  }
+  
+  Order --> OrderState
+}
+
+' Builder Pattern
+package "Builder Pattern" {
+  interface "IDocumentBuilder" {
+    +buildHeader()
+    +buildBody()
+    +buildFooter()
+    +getResult(): Document
+  }
+  
+  class "PdfDocumentBuilder" {
+    +buildHeader()
+    +buildBody()
+    +buildFooter()
+    +getResult(): PdfDocument
+  }
+  
+  class "HtmlDocumentBuilder" {
+    +buildHeader()
+    +buildBody()
+    +buildFooter()
+    +getResult(): HtmlDocument
+  }
+  
+  IDocumentBuilder <|.. PdfDocumentBuilder
+  IDocumentBuilder <|.. HtmlDocumentBuilder
+}
+
+@enduml
