@@ -38,7 +38,7 @@ export const getAllVehicles = async () => {
 export const searchVehicles = async (filters) => {
     try {
         const res = await axios.get("/api/vehicules/search", { params: filters });
-
+        console.log(res.request);
         if (res.status !== 200) {
             console.log("Unable to fetch vehicles");
             return null;
@@ -210,6 +210,17 @@ export const login = async (data) => {
 
     if(res.status !== 200 && res.status !== 201 ){
         return console.log(`Unable to authenticate ${res.status}`);
+    }
+
+    const resData = await res.data;
+    return resData;
+}
+
+export const logout = async () => {
+    const res = await axios.post(`/api/v1/users/logout`).catch((err)=> console.log(err));
+
+    if(res.status !== 200 && res.status !== 201 ){
+        return console.log(`Unable to logout ${res.status}`);
     }
 
     const resData = await res.data;

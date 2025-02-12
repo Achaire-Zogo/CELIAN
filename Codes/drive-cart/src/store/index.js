@@ -19,6 +19,7 @@ const authSlice = createSlice({
         },
         logout(state) {
             state.isLoggedIn = false;
+            state.isAdmin = false;
         },
         addItem(state) {
             state.openSnackbar = true;

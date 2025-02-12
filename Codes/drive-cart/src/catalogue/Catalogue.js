@@ -18,20 +18,36 @@ const Catalogue = () => {
 
   // Search filters
   const [searchParams, setSearchParams] = useState({
+    type: '',
     model: '',
     marque: '',
-    type: '',
     minPrice: '',
     maxPrice: '',
   });
 
   const snackbarId = useSelector((state) => state.vehicleSnackbarId);
 
+  // Function to clean search parameters
+  const cleanSearchParams = (params) => {
+    const cleanedParams = {};
+    for (const key in params) {
+      if (params[key] !== '' && params[key] != null) {
+        cleanedParams[key] = params[key];
+      }
+    }
+    return cleanedParams;
+  };
+
   // Fetch vehicles when search is triggered
   const handleSearch = () => {
     setLoading(true);
-    searchVehicles(searchParams)
+
+    // Clean the search parameters
+    const cleanedSearchParams = cleanSearchParams(searchParams);
+
+    searchVehicles(cleanedSearchParams)
       .then((data) => {
+        console.log(data);
         setVehicles(data);
         setLoading(false);
       })

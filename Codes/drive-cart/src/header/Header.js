@@ -10,13 +10,12 @@ import Badge from '@mui/material/Badge';
 import MenuItem from '@mui/material/MenuItem';
 import Menu from '@mui/material/Menu';
 import MenuIcon from '@mui/icons-material/Menu';
-import ShoppingBasketIcon from '@mui/icons-material/ShoppingBasket';
 import SearchIcon from '@mui/icons-material/Search';
 import AccountCircle from '@mui/icons-material/AccountCircle';
 import MailIcon from '@mui/icons-material/Mail';
 import NotificationsIcon from '@mui/icons-material/Notifications';
 import MoreIcon from '@mui/icons-material/MoreVert';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import MyDrawer from './Drawer';
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 import { useDispatch, useSelector } from 'react-redux';
@@ -62,9 +61,12 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
 
 function Header() {
   const dispatch = useDispatch();
+  const navigate = useNavigate();
+  
   const [anchorEl, setAnchorEl] = React.useState(null);
   const [mobileMoreAnchorEl, setMobileMoreAnchorEl] = React.useState(null);
   const [open, setOpen] = React.useState(false);
+  const isLoggedIn = useSelector(state => state.isLoggedIn);
 
   const isMenuOpen = Boolean(anchorEl);
   const isMobileMenuOpen = Boolean(mobileMoreAnchorEl);
@@ -85,6 +87,14 @@ function Header() {
     setAnchorEl(null);
     handleMobileMenuClose();
   };
+
+  const handleLogout = ()=>{
+    handleMenuClose();
+    
+    localStorage.clear();
+    dispatch(authActions.logout());
+    navigate('/login');
+  }
 
   const handleMobileMenuOpen = (event) => {
     setMobileMoreAnchorEl(event.currentTarget);
@@ -109,6 +119,8 @@ function Header() {
     >
       <MenuItem onClick={handleMenuClose} component={Link} to={'/login'}>Login</MenuItem>
       <MenuItem onClick={handleMenuClose} component={Link} to={'/register'}>Register</MenuItem>
+      {isLoggedIn &&  <MenuItem onClick={handleLogout}>logout</MenuItem>}
+
     </Menu>
   );
 
