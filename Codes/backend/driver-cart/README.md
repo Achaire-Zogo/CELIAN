@@ -124,7 +124,7 @@ Les commandes utilisent les patrons Factory Method et State :
 - Swagger UI accessible à : `http://localhost:8080/swagger-ui.html`
 - Documentation OpenAPI à : `http://localhost:8080/v3/api-docs`
 
-## Démarrage
+## Démarrage en local
 
 1. Créer la base de données :
    ```sql
@@ -140,6 +140,19 @@ Les commandes utilisent les patrons Factory Method et State :
    ```bash
    mvn spring-boot:run
    ```
+
+## Démarrage avec Docker
+
+1. Lancement de tout le projet (Frontend et Backend):
+   ```docker
+   docker compose up --build
+   ```
+
+2. Arret des services:
+   ```docker
+   docker compose down
+   ```
+
 
 ## Documentation API
 Une documentation complète est disponible via Swagger UI à `http://localhost:8080/swagger-ui.html`
